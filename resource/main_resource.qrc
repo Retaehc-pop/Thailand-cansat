@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="BG">
+    <file>C:/Users/Papop/Pictures/maxresdefault.jpg</file>
+    <file>Image/SPACE_SPLASH.png</file>
+  </qresource>
+  <qresource prefix="LOGO">
+    <file>logo.png</file>
+  </qresource>
+</RCC>
