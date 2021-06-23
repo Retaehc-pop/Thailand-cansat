@@ -1,5 +1,4 @@
 from main import *
-from pyqtgraph import PlotWidget, opengl
 import pyqtgraph as pg
 
 GLOBAL_STATE = 0

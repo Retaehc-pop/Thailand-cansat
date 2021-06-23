@@ -1,7 +1,10 @@
 import Port
 import serial
-from UI_main import Ui_GrounStation as UI_MainWindow
+
+import RTC
+from ui_main import Ui_GrounStation as UI_MainWindow
 from UI_splashscreen import Ui_MainWindow as UI_splashscreen
+from UI_Function import *
 import sys
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtGui import *
@@ -13,22 +16,27 @@ class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         self.ui = UI_MainWindow()
+        self.ui.setupUi(self)
         self.connect_btn()
-        # def move_window(event):
-        #     if UiFunctions.return_status(self) == 1:
-        #         UiFunctions.maximize_restore(self)
-        #
-        #     if event.buttons() == Qt.LeftButton:
-        #         self.move(self.pos() + event.globalPos() - self.dragPos)
-        #         self.dragPos = event.globalPos()
-        #         event.accept()
-        #
-        # self.ui.TitleBar.mouseMoveEvent = move_window
-        # UiFunctions.ui_definitions(self)
+
+        def move_window(event):
+            if UiFunctions.return_status(self) == 1:
+                UiFunctions.maximize_restore(self)
+
+            if event.buttons() == Qt.LeftButton:
+                self.move(self.pos() + event.globalPos() - self.dragPos)
+                self.dragPos = event.globalPos()
+                event.accept()
+
+        self.ui.headframe.mouseMoveEvent = move_window
+        UiFunctions.ui_definitions(self)
         self.show()
 
+    def mousePressEvent(self, event):
+        self.dragPos = event.globalPos()
+
     def connect_btn(self):
-        self.ui.btn_connect.clicked.connect(self.connect)
+        self.ui.btn_connect.clicked.connect(self.online)
         self.ui.btn_refresh.clicked.connect(self.refresh)
         self.ui.btn_clear.clicked.connect(self.clear)
         self.ui.btn_c_on.clicked.connect(lambda: self.cmd('C_ON'))
@@ -44,19 +52,22 @@ class MainWindow(QMainWindow):
     def clear(self):
         pass
 
-    def connect(self):
+    def online(self):
         port = self.ui.portlist.currentText()
         try:
-            self.device = serial.Serial(self.A, baudrate=int(9600), timeout=60)
+            self.device = serial.Serial(port, baudrate=int(9600), timeout=60)
             Window.start_serial(self.device)
             Window.start_clock()
         except:
             print("[Cannot connect port]")
 
     def cmd(self, cmd):
-        pass
+        self.device.write(f"CMD,{cmd}$".encode())
+        print(f"CMD,{cmd}$")
+
 
 GLOBAL_SPLASH_COUNTER = 0
+
 
 class SplashScreen(QMainWindow):
     def __init__(self):
@@ -95,6 +106,68 @@ class SplashScreen(QMainWindow):
         GLOBAL_SPLASH_COUNTER += 1
 
 
+class ThreadMain(QThread):
+    # @Slot(float, result=int,)
+    # def get(self,f):
+    #     return int(f)
+
+    carrier1 = QtCore.Signal(object)
+    carrier2 = QtCore.Signal(object)
+    carrier3 = QtCore.Signal(object)
+
+    def __init__(self, device, parent=None):
+        super(ThreadMain, self).__init__(parent)
+        self.device = device
+        self.port = Port.Port(device=self.device)
+        # self.startread.connect_port(9600)
+
+    def __del__(self):
+        self.wait()
+
+    def run(self):
+        print('[THREAD_MAIN_START]')
+        while True:
+            self.pkg = self.port.reading()
+            print(f"[THREAD_IN] : {self.pkg}")
+            if self.pkg[3] == 'C':
+                print('[CANSAT]', end="")
+                self.pkg1 = self.pkg[:]
+                self.carrier1.emit(self.pkg1)
+            elif self.pkg[3] == 'SP1':
+                print('[PAYLOAD1]', end="")
+                self.pkg2 = self.pkg[:]
+                self.carrier2.emit(self.pkg2)
+            elif self.pkg[3] == 'SP2':
+                print('[PAYLOAD2]', end="")
+                self.pkg3 = self.pkg[:]
+                self.carrier3.emit(self.pkg3)
+
+    def stop(self):
+        self._isRunning = False
+
+
+class ThreadTimer(QThread):
+    time_carrier = QtCore.Signal(object)
+    elapsed_carrier = QtCore.Signal(object)
+
+    def __init__(self, parent=None):
+        self._isRunning = True
+        super(ThreadTimer, self).__init__(parent)
+
+    def __del__(self):
+        self.wait()
+
+    def run(self):
+        clock = RTC.GetTime()
+        while True:
+            self.time_carrier.emit(clock.time_pc())
+            self.elapsed_carrier.emit(clock.time_elapsed())
+
+    def stop(self):
+        self._isRunning = False
+        self.terminate()
+
+
 class Controller:
     def __init__(self):
         self.show_splash()
@@ -108,6 +181,34 @@ class Controller:
         self.window_ui = QtWidgets.QMainWindow()
         self.ui_main = MainWindow()
         print('[MAINWINDOW]', end="")
+
+    def start_clock(self):
+        self.worker_time = ThreadTimer()
+        self.worker_time.time_carrier.connect(self.update_time)
+        self.worker_time.elapsed_carrier.connect(self.update_elapsed)
+        self.worker_time.start()
+
+    def start_serial(self, device):
+        self.worker_serial = ThreadMain(device)
+        self.worker_serial.carrier1.connect(self.update_cansat)
+        self.worker_serial.carrier2.connect(self.update_rocket)
+        self.worker_serial.carrier3.connect(self.update_ground)
+        self.worker_serial.start()
+
+    def update_time(self, time):
+        self.ui_main.ui.Time.setText(time)
+
+    def update_elapsed(self, time):
+        self.ui_main.ui.Elapsed.setText(time)
+
+    def update_cansat(self, data):
+        pass
+
+    def update_rocket(self, data):
+        pass
+
+    def update_ground(self, data):
+        pass
 
 
 if __name__ == "__main__":
