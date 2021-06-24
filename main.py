@@ -12,6 +12,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
+from GNSS import Coord
 
 
 class MainWindow(QMainWindow):
@@ -189,12 +190,12 @@ class Controller:
                   "LNG": 0, "TEM": 0, "HUM": 0,
                   "PRE": 0, "BAT": 0, "P10": 0,
                   "P25": 0, "ACX": 0, "ACY": 0,
-                  "ACZ": 0, "ORX": 0, "ORY": 0,
-                  "ORZ": 0}
+                  "ACZ": 0, "GYX": 0, "GYY": 0,
+                  "GYZ": 0}
         self.r = {"PKG": 0, "ALT": 0, "LAT": 0,
                   "LNG": 0, "TEM": 0, "BAT": 0,
                   "ACX": 0, "ACY": 0, "ACZ": 0,
-                  "ORX": 0, "ORY": 0, "ORZ": 0}
+                  "GYX": 0, "GYY": 0, "GYZ": 0}
         self.g = {"LAT": 0.0, "LNG": 0.0, "ALT": 0.0,
                   "MGX": 0.0, "MGY": 0.0, "MGZ": 0.0}
 
@@ -259,9 +260,9 @@ class Controller:
                       "CHART": self.chart_vel,
                       "X-AXIS": self.axisX_vel,
                       "Y-AXIS": self.axisY_vel,
-                      "TITLE": f'Velocity {self.to_vel(self.c["ACX"],self.c["ACY"],self.c["ACZ"])} m/s',
+                      "TITLE": f'Velocity {self.to_vel(self.c["ACX"], self.c["ACY"], self.c["ACZ"])} m/s',
                       "X": self.c["PKG"],
-                      "y": self.to_vel(self.c["ACX"],self.c["ACY"],self.c["ACZ"])}
+                      "y": self.to_vel(self.c["ACX"], self.c["ACY"], self.c["ACZ"])}
 
         self.C_HUM = {"GRAPH": self.ui_main.ui.C_humid_graph,
                       "LINE": self.spline_hum,
@@ -272,6 +273,7 @@ class Controller:
                       "TITLE": f"HUMIDITY {self.c['HUM']} %",
                       "X": self.c["PKG"],
                       "y": self.c["HUM"]}
+
         self.R_ALT = {"GRAPH": self.ui_main.ui.R_alt_graph,
                       "LINE": self.spline_altr,
                       "POINT": self.point_altr,
@@ -298,9 +300,9 @@ class Controller:
                       "CHART": self.chart_velr,
                       "X-AXIS": self.axisX_velr,
                       "Y-AXIS": self.axisY_velr,
-                      "TITLE": f'VELOCITY {self.to_vel(self.r["ACX"],self.r["ACY"],self.r["ACZ"])} %',
+                      "TITLE": f'VELOCITY {self.to_vel(self.r["ACX"], self.r["ACY"], self.r["ACZ"])} %',
                       "X": self.c["PKG"],
-                      "y": self.to_vel(self.r["ACX"],self.r["ACY"],self.r["ACZ"])}
+                      "y": self.to_vel(self.r["ACX"], self.r["ACY"], self.r["ACZ"])}
 
         self.GRAPH = [self.C_ALT, self.C_TEMP, self.C_VEL, self.C_HUM, self.R_ALT, self.R_TEMP, self.R_VEL]
 
@@ -311,8 +313,8 @@ class Controller:
             item["CHART"].setAnimationOptions(QChart.SeriesAnimations)
             item["CHART"].setTheme(QChart.ChartThemeDark)
             item["CHART"].createDefaultAxes()
-            item["X-AXIS"].setRange(0,100)
-            item["Y-AXIS"].setRange(0,100)
+            item["X-AXIS"].setRange(0, 100)
+            item["Y-AXIS"].setRange(0, 100)
             item["CHART"].setAxisX(item["X-AXIS"], item["LINE"])
             item["CHART"].setAxisY(item["Y-AXIS"], item["LINE"])
             item["CHART"].addSeries(item["LINE"])
@@ -321,8 +323,8 @@ class Controller:
             item["GRAPH"].setChart(item["CHART"])
 
     def update_graph(self, item):
-        item["LINE"].append(item["X"],item["Y"])
-        item["POINT"].append(item["X"],item["Y"])
+        item["LINE"].append(item["X"], item["Y"])
+        item["POINT"].append(item["X"], item["Y"])
         item["X-AXIS"].setRange(min(item["X"]), max(item["X"]))
         item["Y-AXIS"].setRange(min(item["Y"]), max(item["Y"]))
         item["CHART"].setAxisX(item["X-AXIS"], item["LINE"])
@@ -349,10 +351,11 @@ class Controller:
         self.c["ACX"] = float(data[11])
         self.c["ACY"] = float(data[12])
         self.c["ACZ"] = float(data[13])
-        self.c["ORX"] = float(data[14])
-        self.c["ORY"] = float(data[15])
-        self.c["ORZ"] = float(data[16])
-        self.update_main()
+        self.c["GYX"] = float(data[14])
+        self.c["GYY"] = float(data[15])
+        self.c["GYZ"] = float(data[16])
+        self.thread_c = threading.Thread(target=self.update_c)
+        self.thread_c.start()
 
     def update_rocket(self, data):
         self.r["PKG"] = int(data[1])
@@ -364,10 +367,11 @@ class Controller:
         self.r["ACX"] = float(data[7])
         self.r["ACY"] = float(data[8])
         self.r["ACZ"] = float(data[9])
-        self.r["ORX"] = float(data[10])
-        self.r["ORY"] = float(data[11])
-        self.r["ORZ"] = float(data[12])
-        self.update_main()
+        self.r["GYX"] = float(data[10])
+        self.r["GYY"] = float(data[11])
+        self.r["GYZ"] = float(data[12])
+        self.thread_r = threading.Thread(target=self.update_r)
+        self.thread_r.start()
 
     def update_ground(self, data):
         self.g["LAT"] = float(data[1])
@@ -376,42 +380,56 @@ class Controller:
         self.g["MGX"] = float(data[4])
         self.g["MGY"] = float(data[4])
         self.g["MGZ"] = float(data[4])
+        self.thread_g = threading.Thread(target=self.update_g)
+        self.thread_g.start()
 
-    def update_main(self):
-        self.thread_text = threading.Thread(target=self.update_text)
-        self.thread_bar = threading.Thread(target=self.update_bar)
-        self.thread_graph = threading.Thread(target=self.update_graph)
-        self.thread_text.start()
-        self.thread_bar.start()
+    def update_c(self):
+        self.ui_main.ui.C_pkg.setText(str(self.c["PKG"]))
+        self.ui_main.ui.PM10.setText(f'{self.c["P10"]} ug/m3')
+        self.ui_main.ui.PM25.setText(f'{self.c["P25"]} ug/m3')
+        self.ui_main.ui.AQI.setText(f'{(self.c["P25"] + self.c["P10"]) / 2} ug/m3')
 
-    def update_bar(self):
         self.ui_main.ui.C_accx_bar.setValue(self.c["ACX"])
         self.ui_main.ui.C_accy_bar.setValue(self.c["ACY"])
         self.ui_main.ui.C_accz_bar.setValue(self.c["ACZ"])
 
-        self.ui_main.ui.C_orix_bar.setValue(self.c["ORX"])
-        self.ui_main.ui.C_oriy_bar.setValue(self.c["ORY"])
-        self.ui_main.ui.C_oriz_bar.setValue(self.c["ORZ"])
+        self.ui_main.ui.C_gyrox_bar.setValue(self.c["GYX"])
+        self.ui_main.ui.C_gyroy_bar.setValue(self.c["GYY"])
+        self.ui_main.ui.C_gyroz_bar.setValue(self.c["GYZ"])
+
+        self.update_graph(self.C_ALT)
+        self.update_graph(self.C_TEMP)
+        self.update_graph(self.C_VEL)
+        self.update_graph(self.C_HUM)
+
+    def update_r(self):
+        self.ui_main.ui.R_pkg.setText({self.r["PKG"]})
 
         self.ui_main.ui.R_accx_bar.setValue(self.r["ACX"])
         self.ui_main.ui.R_accy_bar.setValue(self.r["ACY"])
         self.ui_main.ui.R_accz_bar.setValue(self.r["ACZ"])
 
-        self.ui_main.ui.R_orix_bar.setValue(self.r["ORX"])
-        self.ui_main.ui.R_oriy_bar.setValue(self.r["ORY"])
-        self.ui_main.ui.R_oriz_bar.setValue(self.r["ORZ"])
+        self.ui_main.ui.R_gyrox_bar.setValue(self.r["GYX"])
+        self.ui_main.ui.R_gyroy_bar.setValue(self.r["GYY"])
+        self.ui_main.ui.R_gyroz_bar.setValue(self.r["GYZ"])
 
-    def update_text(self):
-        self.ui_main.ui.C_pkg.setText(str(self.c["PKG"]))
-        self.ui_main.ui.PM10.setText(f'{self.c["P10"]} ug/m3')
-        self.ui_main.ui.PM25.setText(f'{self.c["P25"]} ug/m3')
-        self.ui_main.ui.AQI.setText(f'{(self.c["P25"] + self.c["P10"]) / 2} ug/m3')
-        self.ui_main.ui.R_pkg.setText({self.r["PKG"]})
+        self.update_graph(self.R_ALT)
+        self.update_graph(self.R_TEMP)
+        self.update_graph(self.R_VEL)
+
+    def update_g(self):
+        self.GNSS = Coord(self.g["LAT"], self.g["LNG"], self.c["LAT"], self.c["LNG"], self.g["ALT"], self.c["ALT"],
+                          self.g["MGX"], self.g["MGY"], self.g["MGZ"])
+        self.ui_main.ui.Azimuth.setText(self.GNSS.azimuth())
+        self.ui_main.ui.Elevation.setText(self.GNSS.elevation())
+        self.ui_main.ui.GD.setText(self.GNSS.ground_distance())
+        self.ui_main.ui.Sight.setText(self.GNSS.line_of_sight())
 
     @staticmethod
-    def to_vel(a,b,c):
-        vel = math.sqrt((a*a)+(b*b)+(c*c))
+    def to_vel(a, b, c):
+        vel = math.sqrt((a * a) + (b * b) + (c * c))
         return vel
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

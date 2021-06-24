@@ -499,89 +499,70 @@ border-radius: 5px;</string>
              <property name="spacing">
               <number>0</number>
              </property>
-             <item row="0" column="8" rowspan="4" colspan="2">
-              <widget class="QChartView" name="C_humid_graph">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
+             <item row="14" column="5">
+              <widget class="QLabel" name="t_heading">
                <property name="minimumSize">
                 <size>
-                 <width>350</width>
-                 <height>200</height>
+                 <width>100</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>350</width>
-                 <height>250</height>
+                 <width>100</width>
+                 <height>30</height>
                 </size>
+               </property>
+               <property name="text">
+                <string>Heading</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
-             <item row="0" column="4" rowspan="4" colspan="2">
-              <widget class="QChartView" name="C_temp_graph">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
+             <item row="14" column="7">
+              <widget class="QLabel" name="t_sight">
                <property name="minimumSize">
                 <size>
-                 <width>350</width>
-                 <height>200</height>
+                 <width>100</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>350</width>
-                 <height>250</height>
+                 <width>123123</width>
+                 <height>123123</height>
                 </size>
+               </property>
+               <property name="text">
+                <string>Sight</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
-             <item row="0" column="2" rowspan="4" colspan="2">
-              <widget class="QChartView" name="C_alt_graph">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
+             <item row="14" column="6">
+              <widget class="QLabel" name="Heading">
                <property name="minimumSize">
                 <size>
-                 <width>350</width>
-                 <height>200</height>
+                 <width>100</width>
+                 <height>30</height>
                 </size>
                </property>
-               <property name="maximumSize">
-                <size>
-                 <width>350</width>
-                 <height>250</height>
-                </size>
+               <property name="styleSheet">
+                <string notr="true">color: rgb(242, 48, 106);</string>
                </property>
-              </widget>
-             </item>
-             <item row="0" column="6" rowspan="4" colspan="2">
-              <widget class="QChartView" name="C_velo_graph">
-               <property name="minimumSize">
-                <size>
-                 <width>350</width>
-                 <height>200</height>
-                </size>
+               <property name="text">
+                <string>0</string>
                </property>
-               <property name="maximumSize">
-                <size>
-                 <width>350</width>
-                 <height>250</height>
-                </size>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
-             <item row="12" column="0" colspan="10">
+             <item row="12" column="0" colspan="11">
               <widget class="QFrame" name="frame_4">
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>
@@ -591,7 +572,7 @@ border-radius: 5px;</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_5">
                 <item row="4" column="3">
-                 <widget class="QProgressBar" name="C_oriz_bar">
+                 <widget class="QProgressBar" name="C_gyroz_bar">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -747,7 +728,7 @@ QProgressBar::chunk{
                  </widget>
                 </item>
                 <item row="4" column="2">
-                 <widget class="QLabel" name="t_c_orien_z">
+                 <widget class="QLabel" name="t_c_gyro_z">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -761,7 +742,7 @@ QProgressBar::chunk{
                    </size>
                   </property>
                   <property name="text">
-                   <string>ORIEN z</string>
+                   <string>GYRO z</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
@@ -791,7 +772,7 @@ QProgressBar::chunk{
                  </widget>
                 </item>
                 <item row="4" column="7">
-                 <widget class="QProgressBar" name="R_oriz_bar">
+                 <widget class="QProgressBar" name="R_gyroz_bar">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -834,7 +815,7 @@ QProgressBar::chunk{
                  </widget>
                 </item>
                 <item row="4" column="6">
-                 <widget class="QLabel" name="t_r_orien_z">
+                 <widget class="QLabel" name="t_r_gyro_z">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -848,7 +829,7 @@ QProgressBar::chunk{
                    </size>
                   </property>
                   <property name="text">
-                   <string>ORIEN z</string>
+                   <string>GYRO z</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
@@ -914,7 +895,7 @@ border-radius: 10px;
                  </widget>
                 </item>
                 <item row="3" column="2">
-                 <widget class="QLabel" name="t_c_orien_y">
+                 <widget class="QLabel" name="t_c_gyro_y">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -928,7 +909,7 @@ border-radius: 10px;
                    </size>
                   </property>
                   <property name="text">
-                   <string>ORIEN y</string>
+                   <string>GYRO y</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
@@ -979,7 +960,7 @@ QProgressBar::chunk{
                  </widget>
                 </item>
                 <item row="2" column="7">
-                 <widget class="QProgressBar" name="R_orix_bar">
+                 <widget class="QProgressBar" name="R_gyrox_bar">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -1043,7 +1024,7 @@ QProgressBar::chunk{
                  </widget>
                 </item>
                 <item row="2" column="6">
-                 <widget class="QLabel" name="t_r_orien_x">
+                 <widget class="QLabel" name="t_r_gyro_x">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -1057,7 +1038,7 @@ QProgressBar::chunk{
                    </size>
                   </property>
                   <property name="text">
-                   <string>ORIEN x</string>
+                   <string>GYRO x</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
@@ -1087,7 +1068,7 @@ QProgressBar::chunk{
                  </widget>
                 </item>
                 <item row="2" column="2">
-                 <widget class="QLabel" name="t_c_orien_x">
+                 <widget class="QLabel" name="t_c_gyro_x">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -1101,7 +1082,7 @@ QProgressBar::chunk{
                    </size>
                   </property>
                   <property name="text">
-                   <string>ORIEN x</string>
+                   <string>GYRO x</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
@@ -1194,7 +1175,7 @@ QProgressBar::chunk{
                  </widget>
                 </item>
                 <item row="3" column="7">
-                 <widget class="QProgressBar" name="R_oriy_bar">
+                 <widget class="QProgressBar" name="R_gyroy_bar">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -1280,7 +1261,7 @@ QProgressBar::chunk{
                  </widget>
                 </item>
                 <item row="2" column="3">
-                 <widget class="QProgressBar" name="C_orix_bar">
+                 <widget class="QProgressBar" name="C_gyrox_bar">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -1350,7 +1331,7 @@ QProgressBar::chunk{
                  </widget>
                 </item>
                 <item row="3" column="3">
-                 <widget class="QProgressBar" name="C_oriy_bar">
+                 <widget class="QProgressBar" name="C_gyroy_bar">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -1399,7 +1380,7 @@ QProgressBar::chunk{
                  </widget>
                 </item>
                 <item row="3" column="6">
-                 <widget class="QLabel" name="t_r_orien_y">
+                 <widget class="QLabel" name="t_r_gyro_y">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -1413,7 +1394,7 @@ QProgressBar::chunk{
                    </size>
                   </property>
                   <property name="text">
-                   <string>ORIEN y</string>
+                   <string>GYRO y</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
@@ -1443,7 +1424,7 @@ QProgressBar::chunk{
                  </widget>
                 </item>
                 <item row="5" column="1">
-                 <widget class="QLabel" name="C_lat">
+                 <widget class="QLabel" name="C_latitude">
                   <property name="styleSheet">
                    <string>color: rgb(242, 48, 106);</string>
                   </property>
@@ -1456,7 +1437,7 @@ QProgressBar::chunk{
                  </widget>
                 </item>
                 <item row="5" column="5">
-                 <widget class="QLabel" name="R_lat">
+                 <widget class="QLabel" name="R_latitude">
                   <property name="minimumSize">
                    <size>
                     <width>100</width>
@@ -1525,7 +1506,7 @@ QProgressBar::chunk{
                  </widget>
                 </item>
                 <item row="5" column="3">
-                 <widget class="QLabel" name="C_long">
+                 <widget class="QLabel" name="C_longitude">
                   <property name="minimumSize">
                    <size>
                     <width>100</width>
@@ -1572,7 +1553,7 @@ QProgressBar::chunk{
                  </widget>
                 </item>
                 <item row="5" column="7">
-                 <widget class="QLabel" name="R_long">
+                 <widget class="QLabel" name="R_longitude">
                   <property name="minimumSize">
                    <size>
                     <width>100</width>
@@ -1643,8 +1624,8 @@ QProgressBar::chunk{
                </layout>
               </widget>
              </item>
-             <item row="14" column="8">
-              <widget class="QLabel" name="t_gd">
+             <item row="2" column="0">
+              <widget class="QLabel" name="t_c_pkg">
                <property name="minimumSize">
                 <size>
                  <width>100</width>
@@ -1654,109 +1635,101 @@ QProgressBar::chunk{
                <property name="maximumSize">
                 <size>
                  <width>100</width>
-                 <height>30</height>
+                 <height>60</height>
                 </size>
                </property>
                <property name="text">
-                <string>GD.</string>
+                <string>OPR : </string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
-             <item row="14" column="9">
-              <widget class="QLabel" name="GD">
+             <item row="0" column="9" rowspan="4" colspan="2">
+              <widget class="QChartView" name="C_humid_graph">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="minimumSize">
                 <size>
-                 <width>100</width>
-                 <height>30</height>
+                 <width>350</width>
+                 <height>200</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>100</width>
-                 <height>30</height>
+                 <width>350</width>
+                 <height>250</height>
                 </size>
-               </property>
-               <property name="styleSheet">
-                <string>color: rgb(242, 48, 106);</string>
-               </property>
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
-              <widget class="QProgressBar" name="C_batt_Bar">
+             <item row="0" column="4" rowspan="4" colspan="2">
+              <widget class="QChartView" name="C_temp_graph">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="minimumSize">
                 <size>
-                 <width>0</width>
-                 <height>30</height>
+                 <width>350</width>
+                 <height>200</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>100</width>
-                 <height>16777215</height>
+                 <width>350</width>
+                 <height>250</height>
                 </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QProgressBar{
-	
-	background-color: rgb(43, 59, 77);
-	color: rgb(210, 222, 226);
-	border-style: none;	
-	border-radius: 5px;
-	text-alignL center;
-}
-QProgressBar::chunk{
-	border-radius: 5px;
-	
-	background-color: rgb(56, 122, 71);
-}</string>
-               </property>
-               <property name="value">
-                <number>100</number>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-               <property name="textVisible">
-                <bool>true</bool>
-               </property>
-               <property name="format">
-                <string>%p</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="t_c_batt">
+             <item row="0" column="2" rowspan="4" colspan="2">
+              <widget class="QChartView" name="C_alt_graph">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="minimumSize">
                 <size>
-                 <width>0</width>
-                 <height>0</height>
+                 <width>350</width>
+                 <height>200</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>16777215</width>
-                 <height>16777215</height>
+                 <width>350</width>
+                 <height>250</height>
                 </size>
-               </property>
-               <property name="text">
-                <string>Battery</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
-             <item row="4" column="0" colspan="2">
-              <widget class="QLabel" name="t_rocket_1">
+             <item row="0" column="6" rowspan="4" colspan="3">
+              <widget class="QChartView" name="C_velo_graph">
+               <property name="minimumSize">
+                <size>
+                 <width>350</width>
+                 <height>200</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>350</width>
+                 <height>250</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0" colspan="2">
+              <widget class="QLabel" name="t_container_1">
                <property name="minimumSize">
                 <size>
                  <width>200</width>
@@ -1769,14 +1742,93 @@ QProgressBar::chunk{
                  <height>60</height>
                 </size>
                </property>
+               <property name="autoFillBackground">
+                <bool>false</bool>
+               </property>
                <property name="styleSheet">
                 <string notr="true">font: 800 24pt &quot;Apple SD Gothic Neo&quot;;
 alternate-background-color: rgba(255, 255, 255, 100);
+background-color: none;
 border-radius: 10px;
 </string>
                </property>
                <property name="text">
-                <string>ROCKET</string>
+                <string>CANSAT</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLabel" name="C_on">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>100</width>
+                 <height>60</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color: rgb(67, 231, 163);</string>
+               </property>
+               <property name="text">
+                <string>NO</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="t_operation">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>100</width>
+                 <height>60</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>PKG :</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QLabel" name="R_pkg">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>100</width>
+                 <height>60</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string>color: rgb(242, 48, 106);</string>
+               </property>
+               <property name="text">
+                <string>0</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -1830,8 +1882,101 @@ border-radius: 10px;
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
-              <widget class="QLabel" name="R_pkg">
+             <item row="3" column="0">
+              <widget class="QLabel" name="t_c_batt">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Battery</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0" colspan="2">
+              <widget class="QLabel" name="t_rocket_1">
+               <property name="minimumSize">
+                <size>
+                 <width>200</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>60</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">font: 800 24pt &quot;Apple SD Gothic Neo&quot;;
+alternate-background-color: rgba(255, 255, 255, 100);
+border-radius: 10px;
+</string>
+               </property>
+               <property name="text">
+                <string>ROCKET</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QProgressBar" name="C_batt_Bar">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>100</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QProgressBar{
+	
+	background-color: rgb(43, 59, 77);
+	color: rgb(210, 222, 226);
+	border-style: none;	
+	border-radius: 5px;
+	text-alignL center;
+}
+QProgressBar::chunk{
+	border-radius: 5px;
+	
+	background-color: rgb(56, 122, 71);
+}</string>
+               </property>
+               <property name="value">
+                <number>100</number>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <property name="textVisible">
+                <bool>true</bool>
+               </property>
+               <property name="format">
+                <string>%p</string>
+               </property>
+              </widget>
+             </item>
+             <item row="14" column="10">
+              <widget class="QLabel" name="GD">
                <property name="minimumSize">
                 <size>
                  <width>100</width>
@@ -1841,7 +1986,7 @@ border-radius: 10px;
                <property name="maximumSize">
                 <size>
                  <width>100</width>
-                 <height>60</height>
+                 <height>30</height>
                 </size>
                </property>
                <property name="styleSheet">
@@ -1855,8 +2000,30 @@ border-radius: 10px;
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="t_operation">
+             <item row="14" column="9">
+              <widget class="QLabel" name="t_gd">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>123123</width>
+                 <height>123123</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>GD.</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="t_r_pkg">
                <property name="minimumSize">
                 <size>
                  <width>100</width>
@@ -1868,113 +2035,9 @@ border-radius: 10px;
                  <width>100</width>
                  <height>60</height>
                 </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true"/>
                </property>
                <property name="text">
                 <string>PKG :</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QLabel" name="C_on">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>60</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(67, 231, 163);</string>
-               </property>
-               <property name="text">
-                <string>NO</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0" colspan="2">
-              <widget class="QLabel" name="t_container_1">
-               <property name="minimumSize">
-                <size>
-                 <width>200</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>60</height>
-                </size>
-               </property>
-               <property name="autoFillBackground">
-                <bool>false</bool>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">font: 800 24pt &quot;Apple SD Gothic Neo&quot;;
-alternate-background-color: rgba(255, 255, 255, 100);
-background-color: none;
-border-radius: 10px;
-</string>
-               </property>
-               <property name="text">
-                <string>CANSAT</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="t_c_pkg">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>60</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>OPR : </string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="0">
-              <widget class="QLabel" name="t_apogee">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>60</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>PEAK :</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -2006,8 +2069,8 @@ border-radius: 10px;
                </property>
               </widget>
              </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="t_r_pkg">
+             <item row="6" column="0">
+              <widget class="QLabel" name="t_apogee">
                <property name="minimumSize">
                 <size>
                  <width>100</width>
@@ -2021,7 +2084,7 @@ border-radius: 10px;
                 </size>
                </property>
                <property name="text">
-                <string>PKG :</string>
+                <string>PEAK :</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -2053,79 +2116,7 @@ border-radius: 10px;
                </property>
               </widget>
              </item>
-             <item row="14" column="4">
-              <widget class="QLabel" name="t_ele">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>Elevation</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="14" column="2">
-              <widget class="QLabel" name="t_az">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>Azimuth</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="14" column="3">
-              <widget class="QLabel" name="Azimuth">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="cursor">
-                <cursorShape>ArrowCursor</cursorShape>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">color: rgb(242, 48, 106);</string>
-               </property>
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="14" column="7">
+             <item row="14" column="8">
               <widget class="QLabel" name="Sight">
                <property name="minimumSize">
                 <size>
@@ -2144,53 +2135,6 @@ border-radius: 10px;
                </property>
                <property name="text">
                 <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="14" column="5">
-              <widget class="QLabel" name="Elevation">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string>color: rgb(242, 48, 106);</string>
-               </property>
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="14" column="6">
-              <widget class="QLabel" name="t_sight">
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>Sight</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -2287,6 +2231,22 @@ QProgressBar::chunk{
                </property>
               </widget>
              </item>
+             <item row="4" column="6" rowspan="5" colspan="3">
+              <widget class="QChartView" name="R_velo_graph">
+               <property name="minimumSize">
+                <size>
+                 <width>350</width>
+                 <height>200</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>350</width>
+                 <height>250</height>
+                </size>
+               </property>
+              </widget>
+             </item>
              <item row="4" column="4" rowspan="5" colspan="2">
               <widget class="QChartView" name="R_temp_graph">
                <property name="sizePolicy">
@@ -2309,23 +2269,104 @@ QProgressBar::chunk{
                </property>
               </widget>
              </item>
-             <item row="4" column="6" rowspan="5" colspan="2">
-              <widget class="QChartView" name="R_velo_graph">
+             <item row="14" column="0" colspan="2">
+              <widget class="QLabel" name="t_az">
                <property name="minimumSize">
                 <size>
-                 <width>350</width>
-                 <height>200</height>
+                 <width>100</width>
+                 <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>350</width>
-                 <height>250</height>
+                 <width>123123</width>
+                 <height>123123</height>
                 </size>
+               </property>
+               <property name="text">
+                <string>Azimuth</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
-             <item row="4" column="8" rowspan="5" colspan="2">
+             <item row="14" column="2">
+              <widget class="QLabel" name="Azimuth">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>100</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="cursor">
+                <cursorShape>ArrowCursor</cursorShape>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color: rgb(242, 48, 106);</string>
+               </property>
+               <property name="text">
+                <string>0</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="14" column="3">
+              <widget class="QLabel" name="t_ele">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>123123</width>
+                 <height>123123</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Elevation</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="14" column="4">
+              <widget class="QLabel" name="Elevation">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>100</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string>color: rgb(242, 48, 106);</string>
+               </property>
+               <property name="text">
+                <string>0</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="9" rowspan="5" colspan="2">
               <widget class="QFrame" name="frame5">
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>

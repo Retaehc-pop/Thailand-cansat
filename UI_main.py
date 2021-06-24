@@ -20,7 +20,7 @@ class Ui_GrounStation(object):
     def setupUi(self, GrounStation):
         if not GrounStation.objectName():
             GrounStation.setObjectName(u"GrounStation")
-        GrounStation.resize(1856, 811)
+        GrounStation.resize(1856, 751)
         GrounStation.setMinimumSize(QSize(0, 0))
         self.centralwidget = QWidget(GrounStation)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -241,21 +241,29 @@ class Ui_GrounStation(object):
         self.gridLayout_2.setSpacing(0)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.t_gd = QLabel(self.frame_2)
-        self.t_gd.setObjectName(u"t_gd")
-        self.t_gd.setMinimumSize(QSize(100, 30))
-        self.t_gd.setMaximumSize(QSize(100, 30))
-        self.t_gd.setAlignment(Qt.AlignCenter)
+        self.t_heading = QLabel(self.frame_2)
+        self.t_heading.setObjectName(u"t_heading")
+        self.t_heading.setMinimumSize(QSize(100, 30))
+        self.t_heading.setMaximumSize(QSize(100, 30))
+        self.t_heading.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.t_gd, 14, 8, 1, 1)
+        self.gridLayout_2.addWidget(self.t_heading, 14, 5, 1, 1)
 
-        self.GD = QLabel(self.frame_2)
-        self.GD.setObjectName(u"GD")
-        self.GD.setMinimumSize(QSize(100, 30))
-        self.GD.setMaximumSize(QSize(100, 30))
-        self.GD.setAlignment(Qt.AlignCenter)
+        self.t_sight = QLabel(self.frame_2)
+        self.t_sight.setObjectName(u"t_sight")
+        self.t_sight.setMinimumSize(QSize(100, 30))
+        self.t_sight.setMaximumSize(QSize(123123, 123123))
+        self.t_sight.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.GD, 14, 9, 1, 1)
+        self.gridLayout_2.addWidget(self.t_sight, 14, 7, 1, 1)
+
+        self.Heading = QLabel(self.frame_2)
+        self.Heading.setObjectName(u"Heading")
+        self.Heading.setMinimumSize(QSize(100, 30))
+        self.Heading.setStyleSheet(u"color: rgb(242, 48, 106);")
+        self.Heading.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.Heading, 14, 6, 1, 1)
 
         self.frame_4 = QFrame(self.frame_2)
         self.frame_4.setObjectName(u"frame_4")
@@ -263,12 +271,12 @@ class Ui_GrounStation(object):
         self.frame_4.setFrameShadow(QFrame.Raised)
         self.gridLayout_5 = QGridLayout(self.frame_4)
         self.gridLayout_5.setObjectName(u"gridLayout_5")
-        self.C_oriz_bar = QProgressBar(self.frame_4)
-        self.C_oriz_bar.setObjectName(u"C_oriz_bar")
-        self.C_oriz_bar.setMinimumSize(QSize(0, 30))
-        self.C_oriz_bar.setMaximumSize(QSize(100, 35))
-        self.C_oriz_bar.setSizeIncrement(QSize(0, 0))
-        self.C_oriz_bar.setStyleSheet(u"QProgressBar{\n"
+        self.C_gyroz_bar = QProgressBar(self.frame_4)
+        self.C_gyroz_bar.setObjectName(u"C_gyroz_bar")
+        self.C_gyroz_bar.setMinimumSize(QSize(0, 30))
+        self.C_gyroz_bar.setMaximumSize(QSize(100, 35))
+        self.C_gyroz_bar.setSizeIncrement(QSize(0, 0))
+        self.C_gyroz_bar.setStyleSheet(u"QProgressBar{\n"
 "	\n"
 "	background-color: rgb(43, 59, 77);\n"
 "	color: rgb(210, 222, 226);\n"
@@ -281,11 +289,11 @@ class Ui_GrounStation(object):
 "	\n"
 "	background-color: rgb(233, 151, 54);\n"
 "}")
-        self.C_oriz_bar.setMinimum(-100)
-        self.C_oriz_bar.setValue(0)
-        self.C_oriz_bar.setAlignment(Qt.AlignCenter)
+        self.C_gyroz_bar.setMinimum(-100)
+        self.C_gyroz_bar.setValue(0)
+        self.C_gyroz_bar.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.C_oriz_bar, 4, 3, 1, 1)
+        self.gridLayout_5.addWidget(self.C_gyroz_bar, 4, 3, 1, 1)
 
         self.t_c_acc_z = QLabel(self.frame_4)
         self.t_c_acc_z.setObjectName(u"t_c_acc_z")
@@ -340,13 +348,13 @@ class Ui_GrounStation(object):
 
         self.gridLayout_5.addWidget(self.C_accx_bar, 2, 1, 1, 1)
 
-        self.t_c_orien_z = QLabel(self.frame_4)
-        self.t_c_orien_z.setObjectName(u"t_c_orien_z")
-        self.t_c_orien_z.setMinimumSize(QSize(0, 30))
-        self.t_c_orien_z.setMaximumSize(QSize(16777215, 35))
-        self.t_c_orien_z.setAlignment(Qt.AlignCenter)
+        self.t_c_gyro_z = QLabel(self.frame_4)
+        self.t_c_gyro_z.setObjectName(u"t_c_gyro_z")
+        self.t_c_gyro_z.setMinimumSize(QSize(0, 30))
+        self.t_c_gyro_z.setMaximumSize(QSize(16777215, 35))
+        self.t_c_gyro_z.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.t_c_orien_z, 4, 2, 1, 1)
+        self.gridLayout_5.addWidget(self.t_c_gyro_z, 4, 2, 1, 1)
 
         self.t_c_acc_x = QLabel(self.frame_4)
         self.t_c_acc_x.setObjectName(u"t_c_acc_x")
@@ -356,11 +364,11 @@ class Ui_GrounStation(object):
 
         self.gridLayout_5.addWidget(self.t_c_acc_x, 2, 0, 1, 1)
 
-        self.R_oriz_bar = QProgressBar(self.frame_4)
-        self.R_oriz_bar.setObjectName(u"R_oriz_bar")
-        self.R_oriz_bar.setMinimumSize(QSize(0, 30))
-        self.R_oriz_bar.setMaximumSize(QSize(100, 35))
-        self.R_oriz_bar.setStyleSheet(u"QProgressBar{\n"
+        self.R_gyroz_bar = QProgressBar(self.frame_4)
+        self.R_gyroz_bar.setObjectName(u"R_gyroz_bar")
+        self.R_gyroz_bar.setMinimumSize(QSize(0, 30))
+        self.R_gyroz_bar.setMaximumSize(QSize(100, 35))
+        self.R_gyroz_bar.setStyleSheet(u"QProgressBar{\n"
 "	\n"
 "	background-color: rgb(43, 59, 77);\n"
 "	color: rgb(210, 222, 226);\n"
@@ -373,19 +381,19 @@ class Ui_GrounStation(object):
 "	\n"
 "	background-color: rgb(233, 151, 54);\n"
 "}")
-        self.R_oriz_bar.setMinimum(-100)
-        self.R_oriz_bar.setValue(0)
-        self.R_oriz_bar.setAlignment(Qt.AlignCenter)
+        self.R_gyroz_bar.setMinimum(-100)
+        self.R_gyroz_bar.setValue(0)
+        self.R_gyroz_bar.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.R_oriz_bar, 4, 7, 1, 1)
+        self.gridLayout_5.addWidget(self.R_gyroz_bar, 4, 7, 1, 1)
 
-        self.t_r_orien_z = QLabel(self.frame_4)
-        self.t_r_orien_z.setObjectName(u"t_r_orien_z")
-        self.t_r_orien_z.setMinimumSize(QSize(0, 30))
-        self.t_r_orien_z.setMaximumSize(QSize(16777215, 35))
-        self.t_r_orien_z.setAlignment(Qt.AlignCenter)
+        self.t_r_gyro_z = QLabel(self.frame_4)
+        self.t_r_gyro_z.setObjectName(u"t_r_gyro_z")
+        self.t_r_gyro_z.setMinimumSize(QSize(0, 30))
+        self.t_r_gyro_z.setMaximumSize(QSize(16777215, 35))
+        self.t_r_gyro_z.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.t_r_orien_z, 4, 6, 1, 1)
+        self.gridLayout_5.addWidget(self.t_r_gyro_z, 4, 6, 1, 1)
 
         self.t_mui = QLabel(self.frame_4)
         self.t_mui.setObjectName(u"t_mui")
@@ -412,13 +420,13 @@ class Ui_GrounStation(object):
 
         self.gridLayout_5.addWidget(self.t_r_acc_y, 3, 4, 1, 1)
 
-        self.t_c_orien_y = QLabel(self.frame_4)
-        self.t_c_orien_y.setObjectName(u"t_c_orien_y")
-        self.t_c_orien_y.setMinimumSize(QSize(0, 30))
-        self.t_c_orien_y.setMaximumSize(QSize(16777215, 35))
-        self.t_c_orien_y.setAlignment(Qt.AlignCenter)
+        self.t_c_gyro_y = QLabel(self.frame_4)
+        self.t_c_gyro_y.setObjectName(u"t_c_gyro_y")
+        self.t_c_gyro_y.setMinimumSize(QSize(0, 30))
+        self.t_c_gyro_y.setMaximumSize(QSize(16777215, 35))
+        self.t_c_gyro_y.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.t_c_orien_y, 3, 2, 1, 1)
+        self.gridLayout_5.addWidget(self.t_c_gyro_y, 3, 2, 1, 1)
 
         self.C_accz_bar = QProgressBar(self.frame_4)
         self.C_accz_bar.setObjectName(u"C_accz_bar")
@@ -443,11 +451,11 @@ class Ui_GrounStation(object):
 
         self.gridLayout_5.addWidget(self.C_accz_bar, 4, 1, 1, 1)
 
-        self.R_orix_bar = QProgressBar(self.frame_4)
-        self.R_orix_bar.setObjectName(u"R_orix_bar")
-        self.R_orix_bar.setMinimumSize(QSize(0, 30))
-        self.R_orix_bar.setMaximumSize(QSize(100, 35))
-        self.R_orix_bar.setStyleSheet(u"QProgressBar{\n"
+        self.R_gyrox_bar = QProgressBar(self.frame_4)
+        self.R_gyrox_bar.setObjectName(u"R_gyrox_bar")
+        self.R_gyrox_bar.setMinimumSize(QSize(0, 30))
+        self.R_gyrox_bar.setMaximumSize(QSize(100, 35))
+        self.R_gyrox_bar.setStyleSheet(u"QProgressBar{\n"
 "	\n"
 "	background-color: rgb(43, 59, 77);\n"
 "	color: rgb(212, 223, 228);\n"
@@ -459,11 +467,11 @@ class Ui_GrounStation(object):
 "	border-radius: 5px;\n"
 "	background-color: rgb(52, 118, 242);\n"
 "}")
-        self.R_orix_bar.setMinimum(-100)
-        self.R_orix_bar.setValue(0)
-        self.R_orix_bar.setAlignment(Qt.AlignCenter)
+        self.R_gyrox_bar.setMinimum(-100)
+        self.R_gyrox_bar.setValue(0)
+        self.R_gyrox_bar.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.R_orix_bar, 2, 7, 1, 1)
+        self.gridLayout_5.addWidget(self.R_gyrox_bar, 2, 7, 1, 1)
 
         self.t_c_acc_y = QLabel(self.frame_4)
         self.t_c_acc_y.setObjectName(u"t_c_acc_y")
@@ -473,13 +481,13 @@ class Ui_GrounStation(object):
 
         self.gridLayout_5.addWidget(self.t_c_acc_y, 3, 0, 1, 1)
 
-        self.t_r_orien_x = QLabel(self.frame_4)
-        self.t_r_orien_x.setObjectName(u"t_r_orien_x")
-        self.t_r_orien_x.setMinimumSize(QSize(0, 30))
-        self.t_r_orien_x.setMaximumSize(QSize(16777215, 35))
-        self.t_r_orien_x.setAlignment(Qt.AlignCenter)
+        self.t_r_gyro_x = QLabel(self.frame_4)
+        self.t_r_gyro_x.setObjectName(u"t_r_gyro_x")
+        self.t_r_gyro_x.setMinimumSize(QSize(0, 30))
+        self.t_r_gyro_x.setMaximumSize(QSize(16777215, 35))
+        self.t_r_gyro_x.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.t_r_orien_x, 2, 6, 1, 1)
+        self.gridLayout_5.addWidget(self.t_r_gyro_x, 2, 6, 1, 1)
 
         self.t_r_acc_x = QLabel(self.frame_4)
         self.t_r_acc_x.setObjectName(u"t_r_acc_x")
@@ -489,13 +497,13 @@ class Ui_GrounStation(object):
 
         self.gridLayout_5.addWidget(self.t_r_acc_x, 2, 4, 1, 1)
 
-        self.t_c_orien_x = QLabel(self.frame_4)
-        self.t_c_orien_x.setObjectName(u"t_c_orien_x")
-        self.t_c_orien_x.setMinimumSize(QSize(0, 30))
-        self.t_c_orien_x.setMaximumSize(QSize(16777215, 35))
-        self.t_c_orien_x.setAlignment(Qt.AlignCenter)
+        self.t_c_gyro_x = QLabel(self.frame_4)
+        self.t_c_gyro_x.setObjectName(u"t_c_gyro_x")
+        self.t_c_gyro_x.setMinimumSize(QSize(0, 30))
+        self.t_c_gyro_x.setMaximumSize(QSize(16777215, 35))
+        self.t_c_gyro_x.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.t_c_orien_x, 2, 2, 1, 1)
+        self.gridLayout_5.addWidget(self.t_c_gyro_x, 2, 2, 1, 1)
 
         self.R_accx_bar = QProgressBar(self.frame_4)
         self.R_accx_bar.setObjectName(u"R_accx_bar")
@@ -542,11 +550,11 @@ class Ui_GrounStation(object):
 
         self.gridLayout_5.addWidget(self.R_accy_bar, 3, 5, 1, 1)
 
-        self.R_oriy_bar = QProgressBar(self.frame_4)
-        self.R_oriy_bar.setObjectName(u"R_oriy_bar")
-        self.R_oriy_bar.setMinimumSize(QSize(0, 30))
-        self.R_oriy_bar.setMaximumSize(QSize(100, 35))
-        self.R_oriy_bar.setStyleSheet(u"QProgressBar{\n"
+        self.R_gyroy_bar = QProgressBar(self.frame_4)
+        self.R_gyroy_bar.setObjectName(u"R_gyroy_bar")
+        self.R_gyroy_bar.setMinimumSize(QSize(0, 30))
+        self.R_gyroy_bar.setMaximumSize(QSize(100, 35))
+        self.R_gyroy_bar.setStyleSheet(u"QProgressBar{\n"
 "	\n"
 "	background-color: rgb(43, 59, 77);\n"
 "	color: rgb(210, 222, 226);\n"
@@ -559,11 +567,11 @@ class Ui_GrounStation(object):
 "	\n"
 "	background-color: rgb(231, 76, 60);\n"
 "}")
-        self.R_oriy_bar.setMinimum(-100)
-        self.R_oriy_bar.setValue(0)
-        self.R_oriy_bar.setAlignment(Qt.AlignCenter)
+        self.R_gyroy_bar.setMinimum(-100)
+        self.R_gyroy_bar.setValue(0)
+        self.R_gyroy_bar.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.R_oriy_bar, 3, 7, 1, 1)
+        self.gridLayout_5.addWidget(self.R_gyroy_bar, 3, 7, 1, 1)
 
         self.R_accz_bar = QProgressBar(self.frame_4)
         self.R_accz_bar.setObjectName(u"R_accz_bar")
@@ -588,12 +596,12 @@ class Ui_GrounStation(object):
 
         self.gridLayout_5.addWidget(self.R_accz_bar, 4, 5, 1, 1)
 
-        self.C_orix_bar = QProgressBar(self.frame_4)
-        self.C_orix_bar.setObjectName(u"C_orix_bar")
-        self.C_orix_bar.setMinimumSize(QSize(0, 30))
-        self.C_orix_bar.setMaximumSize(QSize(100, 35))
-        self.C_orix_bar.setSizeIncrement(QSize(0, 0))
-        self.C_orix_bar.setStyleSheet(u"QProgressBar{\n"
+        self.C_gyrox_bar = QProgressBar(self.frame_4)
+        self.C_gyrox_bar.setObjectName(u"C_gyrox_bar")
+        self.C_gyrox_bar.setMinimumSize(QSize(0, 30))
+        self.C_gyrox_bar.setMaximumSize(QSize(100, 35))
+        self.C_gyrox_bar.setSizeIncrement(QSize(0, 0))
+        self.C_gyrox_bar.setStyleSheet(u"QProgressBar{\n"
 "	\n"
 "	background-color: rgb(43, 59, 77);\n"
 "	color: rgb(212, 223, 228);\n"
@@ -605,11 +613,11 @@ class Ui_GrounStation(object):
 "	border-radius: 5px;\n"
 "	background-color: rgb(52, 118, 242);\n"
 "}")
-        self.C_orix_bar.setMinimum(-100)
-        self.C_orix_bar.setValue(0)
-        self.C_orix_bar.setAlignment(Qt.AlignCenter)
+        self.C_gyrox_bar.setMinimum(-100)
+        self.C_gyrox_bar.setValue(0)
+        self.C_gyrox_bar.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.C_orix_bar, 2, 3, 1, 1)
+        self.gridLayout_5.addWidget(self.C_gyrox_bar, 2, 3, 1, 1)
 
         self.t_r_acc_z = QLabel(self.frame_4)
         self.t_r_acc_z.setObjectName(u"t_r_acc_z")
@@ -619,12 +627,12 @@ class Ui_GrounStation(object):
 
         self.gridLayout_5.addWidget(self.t_r_acc_z, 4, 4, 1, 1)
 
-        self.C_oriy_bar = QProgressBar(self.frame_4)
-        self.C_oriy_bar.setObjectName(u"C_oriy_bar")
-        self.C_oriy_bar.setMinimumSize(QSize(0, 30))
-        self.C_oriy_bar.setMaximumSize(QSize(100, 35))
-        self.C_oriy_bar.setSizeIncrement(QSize(0, 0))
-        self.C_oriy_bar.setStyleSheet(u"QProgressBar{\n"
+        self.C_gyroy_bar = QProgressBar(self.frame_4)
+        self.C_gyroy_bar.setObjectName(u"C_gyroy_bar")
+        self.C_gyroy_bar.setMinimumSize(QSize(0, 30))
+        self.C_gyroy_bar.setMaximumSize(QSize(100, 35))
+        self.C_gyroy_bar.setSizeIncrement(QSize(0, 0))
+        self.C_gyroy_bar.setStyleSheet(u"QProgressBar{\n"
 "	\n"
 "	background-color: rgb(43, 59, 77);\n"
 "	color: rgb(210, 222, 226);\n"
@@ -637,19 +645,19 @@ class Ui_GrounStation(object):
 "	\n"
 "	background-color: rgb(231, 76, 60);\n"
 "}")
-        self.C_oriy_bar.setMinimum(-100)
-        self.C_oriy_bar.setValue(0)
-        self.C_oriy_bar.setAlignment(Qt.AlignCenter)
+        self.C_gyroy_bar.setMinimum(-100)
+        self.C_gyroy_bar.setValue(0)
+        self.C_gyroy_bar.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.C_oriy_bar, 3, 3, 1, 1)
+        self.gridLayout_5.addWidget(self.C_gyroy_bar, 3, 3, 1, 1)
 
-        self.t_r_orien_y = QLabel(self.frame_4)
-        self.t_r_orien_y.setObjectName(u"t_r_orien_y")
-        self.t_r_orien_y.setMinimumSize(QSize(0, 30))
-        self.t_r_orien_y.setMaximumSize(QSize(16777215, 35))
-        self.t_r_orien_y.setAlignment(Qt.AlignCenter)
+        self.t_r_gyro_y = QLabel(self.frame_4)
+        self.t_r_gyro_y.setObjectName(u"t_r_gyro_y")
+        self.t_r_gyro_y.setMinimumSize(QSize(0, 30))
+        self.t_r_gyro_y.setMaximumSize(QSize(16777215, 35))
+        self.t_r_gyro_y.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.t_r_orien_y, 3, 6, 1, 1)
+        self.gridLayout_5.addWidget(self.t_r_gyro_y, 3, 6, 1, 1)
 
         self.t_c_lat = QLabel(self.frame_4)
         self.t_c_lat.setObjectName(u"t_c_lat")
@@ -659,19 +667,19 @@ class Ui_GrounStation(object):
 
         self.gridLayout_5.addWidget(self.t_c_lat, 5, 0, 1, 1)
 
-        self.C_lat = QLabel(self.frame_4)
-        self.C_lat.setObjectName(u"C_lat")
-        self.C_lat.setAlignment(Qt.AlignCenter)
+        self.C_latitude = QLabel(self.frame_4)
+        self.C_latitude.setObjectName(u"C_latitude")
+        self.C_latitude.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.C_lat, 5, 1, 1, 1)
+        self.gridLayout_5.addWidget(self.C_latitude, 5, 1, 1, 1)
 
-        self.R_lat = QLabel(self.frame_4)
-        self.R_lat.setObjectName(u"R_lat")
-        self.R_lat.setMinimumSize(QSize(100, 30))
-        self.R_lat.setMaximumSize(QSize(100, 30))
-        self.R_lat.setAlignment(Qt.AlignCenter)
+        self.R_latitude = QLabel(self.frame_4)
+        self.R_latitude.setObjectName(u"R_latitude")
+        self.R_latitude.setMinimumSize(QSize(100, 30))
+        self.R_latitude.setMaximumSize(QSize(100, 30))
+        self.R_latitude.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.R_lat, 5, 5, 1, 1)
+        self.gridLayout_5.addWidget(self.R_latitude, 5, 5, 1, 1)
 
         self.t_r_lat = QLabel(self.frame_4)
         self.t_r_lat.setObjectName(u"t_r_lat")
@@ -689,13 +697,13 @@ class Ui_GrounStation(object):
 
         self.gridLayout_5.addWidget(self.t_c_long, 5, 2, 1, 1)
 
-        self.C_long = QLabel(self.frame_4)
-        self.C_long.setObjectName(u"C_long")
-        self.C_long.setMinimumSize(QSize(100, 30))
-        self.C_long.setMaximumSize(QSize(100, 30))
-        self.C_long.setAlignment(Qt.AlignCenter)
+        self.C_longitude = QLabel(self.frame_4)
+        self.C_longitude.setObjectName(u"C_longitude")
+        self.C_longitude.setMinimumSize(QSize(100, 30))
+        self.C_longitude.setMaximumSize(QSize(100, 30))
+        self.C_longitude.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.C_long, 5, 3, 1, 1)
+        self.gridLayout_5.addWidget(self.C_longitude, 5, 3, 1, 1)
 
         self.t_r_long = QLabel(self.frame_4)
         self.t_r_long.setObjectName(u"t_r_long")
@@ -705,13 +713,13 @@ class Ui_GrounStation(object):
 
         self.gridLayout_5.addWidget(self.t_r_long, 5, 6, 1, 1)
 
-        self.R_long = QLabel(self.frame_4)
-        self.R_long.setObjectName(u"R_long")
-        self.R_long.setMinimumSize(QSize(100, 30))
-        self.R_long.setMaximumSize(QSize(100, 30))
-        self.R_long.setAlignment(Qt.AlignCenter)
+        self.R_longitude = QLabel(self.frame_4)
+        self.R_longitude.setObjectName(u"R_longitude")
+        self.R_longitude.setMinimumSize(QSize(100, 30))
+        self.R_longitude.setMaximumSize(QSize(100, 30))
+        self.R_longitude.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_5.addWidget(self.R_long, 5, 7, 1, 1)
+        self.gridLayout_5.addWidget(self.R_longitude, 5, 7, 1, 1)
 
         self.t_rocket_2 = QLabel(self.frame_4)
         self.t_rocket_2.setObjectName(u"t_rocket_2")
@@ -730,90 +738,109 @@ class Ui_GrounStation(object):
         self.gridLayout_5.addWidget(self.t_container_2, 1, 0, 1, 4)
 
 
-        self.gridLayout_2.addWidget(self.frame_4, 12, 0, 1, 10)
+        self.gridLayout_2.addWidget(self.frame_4, 12, 0, 1, 11)
 
-        self.label_5 = QLabel(self.frame_2)
-        self.label_5.setObjectName(u"label_5")
-        self.label_5.setMinimumSize(QSize(150, 30))
-        self.label_5.setMaximumSize(QSize(150, 30))
-        self.label_5.setAlignment(Qt.AlignCenter)
+        self.t_c_pkg = QLabel(self.frame_2)
+        self.t_c_pkg.setObjectName(u"t_c_pkg")
+        self.t_c_pkg.setMinimumSize(QSize(100, 30))
+        self.t_c_pkg.setMaximumSize(QSize(100, 60))
+        self.t_c_pkg.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.label_5, 3, 6, 1, 1)
+        self.gridLayout_2.addWidget(self.t_c_pkg, 2, 0, 1, 1)
 
-        self.label_7 = QLabel(self.frame_2)
-        self.label_7.setObjectName(u"label_7")
-        self.label_7.setMinimumSize(QSize(150, 30))
-        self.label_7.setMaximumSize(QSize(150, 30))
-        self.label_7.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.label_7, 10, 6, 1, 1)
-
-        self.graphicsView = QChartView(self.frame_2)
-        self.graphicsView.setObjectName(u"graphicsView")
-        self.graphicsView.setMinimumSize(QSize(350, 200))
-        self.graphicsView.setMaximumSize(QSize(350, 200))
-
-        self.gridLayout_2.addWidget(self.graphicsView, 0, 6, 3, 2)
-
-        self.t_c_humidity = QLabel(self.frame_2)
-        self.t_c_humidity.setObjectName(u"t_c_humidity")
-        self.t_c_humidity.setMinimumSize(QSize(150, 30))
-        self.t_c_humidity.setMaximumSize(QSize(150, 16777215))
-        self.t_c_humidity.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.t_c_humidity, 3, 8, 1, 1)
-
-        self.t_c_temp = QLabel(self.frame_2)
-        self.t_c_temp.setObjectName(u"t_c_temp")
-        self.t_c_temp.setMinimumSize(QSize(150, 30))
-        self.t_c_temp.setMaximumSize(QSize(150, 30))
-        self.t_c_temp.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.t_c_temp, 3, 4, 1, 1)
-
-        self.R_batt_Bar = QProgressBar(self.frame_2)
-        self.R_batt_Bar.setObjectName(u"R_batt_Bar")
-        self.R_batt_Bar.setMinimumSize(QSize(0, 30))
-        self.R_batt_Bar.setMaximumSize(QSize(100, 16777215))
-        self.R_batt_Bar.setStyleSheet(u"QProgressBar{\n"
-"	\n"
-"	background-color: rgb(43, 59, 77);\n"
-"	color: rgb(210, 222, 226);\n"
-"	border-style: none;	\n"
-"	border-radius: 5px;\n"
-"	text-alignL center;\n"
-"}\n"
-"QProgressBar::chunk{\n"
-"	border-radius: 5px;\n"
-"	\n"
-"	background-color: rgb(56, 122, 71);\n"
-"}")
-        self.R_batt_Bar.setValue(100)
-        self.R_batt_Bar.setAlignment(Qt.AlignCenter)
-        self.R_batt_Bar.setTextVisible(True)
-        self.R_batt_Bar.setOrientation(Qt.Horizontal)
-
-        self.gridLayout_2.addWidget(self.R_batt_Bar, 10, 1, 1, 1)
-
-        self.R_temp = QLabel(self.frame_2)
-        self.R_temp.setObjectName(u"R_temp")
-        self.R_temp.setMinimumSize(QSize(150, 30))
-        self.R_temp.setMaximumSize(QSize(150, 16777215))
-        self.R_temp.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.R_temp, 10, 5, 1, 1)
-
-        self.C_alt_graph = QChartView(self.frame_2)
-        self.C_alt_graph.setObjectName(u"C_alt_graph")
+        self.C_humid_graph = QChartView(self.frame_2)
+        self.C_humid_graph.setObjectName(u"C_humid_graph")
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.C_humid_graph.sizePolicy().hasHeightForWidth())
+        self.C_humid_graph.setSizePolicy(sizePolicy)
+        self.C_humid_graph.setMinimumSize(QSize(350, 200))
+        self.C_humid_graph.setMaximumSize(QSize(350, 250))
+
+        self.gridLayout_2.addWidget(self.C_humid_graph, 0, 9, 4, 2)
+
+        self.C_temp_graph = QChartView(self.frame_2)
+        self.C_temp_graph.setObjectName(u"C_temp_graph")
+        sizePolicy.setHeightForWidth(self.C_temp_graph.sizePolicy().hasHeightForWidth())
+        self.C_temp_graph.setSizePolicy(sizePolicy)
+        self.C_temp_graph.setMinimumSize(QSize(350, 200))
+        self.C_temp_graph.setMaximumSize(QSize(350, 250))
+
+        self.gridLayout_2.addWidget(self.C_temp_graph, 0, 4, 4, 2)
+
+        self.C_alt_graph = QChartView(self.frame_2)
+        self.C_alt_graph.setObjectName(u"C_alt_graph")
         sizePolicy.setHeightForWidth(self.C_alt_graph.sizePolicy().hasHeightForWidth())
         self.C_alt_graph.setSizePolicy(sizePolicy)
         self.C_alt_graph.setMinimumSize(QSize(350, 200))
-        self.C_alt_graph.setMaximumSize(QSize(350, 200))
+        self.C_alt_graph.setMaximumSize(QSize(350, 250))
 
-        self.gridLayout_2.addWidget(self.C_alt_graph, 0, 2, 3, 2)
+        self.gridLayout_2.addWidget(self.C_alt_graph, 0, 2, 4, 2)
+
+        self.C_velo_graph = QChartView(self.frame_2)
+        self.C_velo_graph.setObjectName(u"C_velo_graph")
+        self.C_velo_graph.setMinimumSize(QSize(350, 200))
+        self.C_velo_graph.setMaximumSize(QSize(350, 250))
+
+        self.gridLayout_2.addWidget(self.C_velo_graph, 0, 6, 4, 3)
+
+        self.t_container_1 = QLabel(self.frame_2)
+        self.t_container_1.setObjectName(u"t_container_1")
+        self.t_container_1.setMinimumSize(QSize(200, 50))
+        self.t_container_1.setMaximumSize(QSize(16777215, 60))
+        self.t_container_1.setAutoFillBackground(False)
+        self.t_container_1.setStyleSheet(u"font: 800 24pt \"Apple SD Gothic Neo\";\n"
+"alternate-background-color: rgba(255, 255, 255, 100);\n"
+"background-color: none;\n"
+"border-radius: 10px;\n"
+"")
+        self.t_container_1.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.t_container_1, 0, 0, 1, 2)
+
+        self.C_on = QLabel(self.frame_2)
+        self.C_on.setObjectName(u"C_on")
+        self.C_on.setMinimumSize(QSize(100, 30))
+        self.C_on.setMaximumSize(QSize(100, 60))
+        self.C_on.setStyleSheet(u"color: rgb(67, 231, 163);")
+        self.C_on.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.C_on, 2, 1, 1, 1)
+
+        self.t_operation = QLabel(self.frame_2)
+        self.t_operation.setObjectName(u"t_operation")
+        self.t_operation.setMinimumSize(QSize(100, 30))
+        self.t_operation.setMaximumSize(QSize(100, 60))
+        self.t_operation.setStyleSheet(u"")
+        self.t_operation.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.t_operation, 1, 0, 1, 1)
+
+        self.R_pkg = QLabel(self.frame_2)
+        self.R_pkg.setObjectName(u"R_pkg")
+        self.R_pkg.setMinimumSize(QSize(100, 30))
+        self.R_pkg.setMaximumSize(QSize(100, 60))
+        self.R_pkg.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.R_pkg, 5, 1, 1, 1)
+
+        self.R_on = QLabel(self.frame_2)
+        self.R_on.setObjectName(u"R_on")
+        self.R_on.setMinimumSize(QSize(100, 30))
+        self.R_on.setMaximumSize(QSize(100, 60))
+        self.R_on.setStyleSheet(u"color: rgb(67, 231, 163);")
+        self.R_on.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.R_on, 7, 1, 1, 1)
+
+        self.t_r_on = QLabel(self.frame_2)
+        self.t_r_on.setObjectName(u"t_r_on")
+        self.t_r_on.setMinimumSize(QSize(100, 30))
+        self.t_r_on.setMaximumSize(QSize(100, 60))
+        self.t_r_on.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_2.addWidget(self.t_r_on, 7, 0, 1, 1)
 
         self.t_c_batt = QLabel(self.frame_2)
         self.t_c_batt.setObjectName(u"t_c_batt")
@@ -823,13 +850,17 @@ class Ui_GrounStation(object):
 
         self.gridLayout_2.addWidget(self.t_c_batt, 3, 0, 1, 1)
 
-        self.t_r_batt = QLabel(self.frame_2)
-        self.t_r_batt.setObjectName(u"t_r_batt")
-        self.t_r_batt.setMinimumSize(QSize(0, 0))
-        self.t_r_batt.setMaximumSize(QSize(16777215, 16777215))
-        self.t_r_batt.setAlignment(Qt.AlignCenter)
+        self.t_rocket_1 = QLabel(self.frame_2)
+        self.t_rocket_1.setObjectName(u"t_rocket_1")
+        self.t_rocket_1.setMinimumSize(QSize(200, 50))
+        self.t_rocket_1.setMaximumSize(QSize(16777215, 60))
+        self.t_rocket_1.setStyleSheet(u"font: 800 24pt \"Apple SD Gothic Neo\";\n"
+"alternate-background-color: rgba(255, 255, 255, 100);\n"
+"border-radius: 10px;\n"
+"")
+        self.t_rocket_1.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.t_r_batt, 10, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.t_rocket_1, 4, 0, 1, 2)
 
         self.C_batt_Bar = QProgressBar(self.frame_2)
         self.C_batt_Bar.setObjectName(u"C_batt_Bar")
@@ -854,91 +885,21 @@ class Ui_GrounStation(object):
 
         self.gridLayout_2.addWidget(self.C_batt_Bar, 3, 1, 1, 1)
 
-        self.C_temp = QLabel(self.frame_2)
-        self.C_temp.setObjectName(u"C_temp")
-        self.C_temp.setMinimumSize(QSize(150, 30))
-        self.C_temp.setMaximumSize(QSize(150, 16777215))
-        self.C_temp.setAlignment(Qt.AlignCenter)
+        self.GD = QLabel(self.frame_2)
+        self.GD.setObjectName(u"GD")
+        self.GD.setMinimumSize(QSize(100, 30))
+        self.GD.setMaximumSize(QSize(100, 30))
+        self.GD.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.C_temp, 3, 5, 1, 1)
+        self.gridLayout_2.addWidget(self.GD, 14, 10, 1, 1)
 
-        self.t_rocket_1 = QLabel(self.frame_2)
-        self.t_rocket_1.setObjectName(u"t_rocket_1")
-        self.t_rocket_1.setMinimumSize(QSize(200, 50))
-        self.t_rocket_1.setMaximumSize(QSize(16777215, 60))
-        self.t_rocket_1.setStyleSheet(u"font: 800 24pt \"Apple SD Gothic Neo\";\n"
-"alternate-background-color: rgba(255, 255, 255, 100);\n"
-"border-radius: 10px;\n"
-"")
-        self.t_rocket_1.setAlignment(Qt.AlignCenter)
+        self.t_gd = QLabel(self.frame_2)
+        self.t_gd.setObjectName(u"t_gd")
+        self.t_gd.setMinimumSize(QSize(100, 30))
+        self.t_gd.setMaximumSize(QSize(123123, 123123))
+        self.t_gd.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.t_rocket_1, 4, 0, 1, 2)
-
-        self.R_alt_graph = QChartView(self.frame_2)
-        self.R_alt_graph.setObjectName(u"R_alt_graph")
-        sizePolicy.setHeightForWidth(self.R_alt_graph.sizePolicy().hasHeightForWidth())
-        self.R_alt_graph.setSizePolicy(sizePolicy)
-        self.R_alt_graph.setMinimumSize(QSize(350, 200))
-        self.R_alt_graph.setMaximumSize(QSize(350, 200))
-
-        self.gridLayout_2.addWidget(self.R_alt_graph, 4, 2, 4, 2)
-
-        self.R_alt = QLabel(self.frame_2)
-        self.R_alt.setObjectName(u"R_alt")
-        self.R_alt.setMinimumSize(QSize(150, 30))
-        self.R_alt.setMaximumSize(QSize(150, 30))
-        self.R_alt.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.R_alt, 10, 3, 1, 1)
-
-        self.t_apogee = QLabel(self.frame_2)
-        self.t_apogee.setObjectName(u"t_apogee")
-        self.t_apogee.setMinimumSize(QSize(100, 30))
-        self.t_apogee.setMaximumSize(QSize(100, 60))
-        self.t_apogee.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.t_apogee, 6, 0, 1, 1)
-
-        self.C_alt = QLabel(self.frame_2)
-        self.C_alt.setObjectName(u"C_alt")
-        self.C_alt.setMinimumSize(QSize(150, 30))
-        self.C_alt.setMaximumSize(QSize(150, 30))
-        self.C_alt.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.C_alt, 3, 3, 1, 1)
-
-        self.t_r_alt = QLabel(self.frame_2)
-        self.t_r_alt.setObjectName(u"t_r_alt")
-        self.t_r_alt.setMinimumSize(QSize(150, 30))
-        self.t_r_alt.setMaximumSize(QSize(150, 30))
-        self.t_r_alt.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.t_r_alt, 10, 2, 1, 1)
-
-        self.C_temp_graph = QChartView(self.frame_2)
-        self.C_temp_graph.setObjectName(u"C_temp_graph")
-        sizePolicy.setHeightForWidth(self.C_temp_graph.sizePolicy().hasHeightForWidth())
-        self.C_temp_graph.setSizePolicy(sizePolicy)
-        self.C_temp_graph.setMinimumSize(QSize(350, 200))
-        self.C_temp_graph.setMaximumSize(QSize(350, 200))
-
-        self.gridLayout_2.addWidget(self.C_temp_graph, 0, 4, 3, 2)
-
-        self.t_c_alt = QLabel(self.frame_2)
-        self.t_c_alt.setObjectName(u"t_c_alt")
-        self.t_c_alt.setMinimumSize(QSize(150, 30))
-        self.t_c_alt.setMaximumSize(QSize(150, 30))
-        self.t_c_alt.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.t_c_alt, 3, 2, 1, 1)
-
-        self.t_r_temp = QLabel(self.frame_2)
-        self.t_r_temp.setObjectName(u"t_r_temp")
-        self.t_r_temp.setMinimumSize(QSize(150, 30))
-        self.t_r_temp.setMaximumSize(QSize(150, 30))
-        self.t_r_temp.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.t_r_temp, 10, 4, 1, 1)
+        self.gridLayout_2.addWidget(self.t_gd, 14, 9, 1, 1)
 
         self.t_r_pkg = QLabel(self.frame_2)
         self.t_r_pkg.setObjectName(u"t_r_pkg")
@@ -956,22 +917,13 @@ class Ui_GrounStation(object):
 
         self.gridLayout_2.addWidget(self.C_pkg, 1, 1, 1, 1)
 
-        self.C_humidity = QLabel(self.frame_2)
-        self.C_humidity.setObjectName(u"C_humidity")
-        self.C_humidity.setMinimumSize(QSize(150, 30))
-        self.C_humidity.setMaximumSize(QSize(150, 16777215))
-        self.C_humidity.setAlignment(Qt.AlignCenter)
+        self.t_apogee = QLabel(self.frame_2)
+        self.t_apogee.setObjectName(u"t_apogee")
+        self.t_apogee.setMinimumSize(QSize(100, 30))
+        self.t_apogee.setMaximumSize(QSize(100, 60))
+        self.t_apogee.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.C_humidity, 3, 9, 1, 1)
-
-        self.C_humid_graph = QChartView(self.frame_2)
-        self.C_humid_graph.setObjectName(u"C_humid_graph")
-        sizePolicy.setHeightForWidth(self.C_humid_graph.sizePolicy().hasHeightForWidth())
-        self.C_humid_graph.setSizePolicy(sizePolicy)
-        self.C_humid_graph.setMinimumSize(QSize(350, 200))
-        self.C_humid_graph.setMaximumSize(QSize(350, 200))
-
-        self.gridLayout_2.addWidget(self.C_humid_graph, 0, 8, 3, 2)
+        self.gridLayout_2.addWidget(self.t_apogee, 6, 0, 1, 1)
 
         self.apogee = QLabel(self.frame_2)
         self.apogee.setObjectName(u"apogee")
@@ -982,87 +934,78 @@ class Ui_GrounStation(object):
 
         self.gridLayout_2.addWidget(self.apogee, 6, 1, 1, 1)
 
-        self.t_r_on = QLabel(self.frame_2)
-        self.t_r_on.setObjectName(u"t_r_on")
-        self.t_r_on.setMinimumSize(QSize(100, 30))
-        self.t_r_on.setMaximumSize(QSize(100, 60))
-        self.t_r_on.setAlignment(Qt.AlignCenter)
+        self.Sight = QLabel(self.frame_2)
+        self.Sight.setObjectName(u"Sight")
+        self.Sight.setMinimumSize(QSize(100, 30))
+        self.Sight.setMaximumSize(QSize(100, 30))
+        self.Sight.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.t_r_on, 7, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.Sight, 14, 8, 1, 1)
 
-        self.R_pkg = QLabel(self.frame_2)
-        self.R_pkg.setObjectName(u"R_pkg")
-        self.R_pkg.setMinimumSize(QSize(100, 30))
-        self.R_pkg.setMaximumSize(QSize(100, 60))
-        self.R_pkg.setAlignment(Qt.AlignCenter)
+        self.t_r_batt = QLabel(self.frame_2)
+        self.t_r_batt.setObjectName(u"t_r_batt")
+        self.t_r_batt.setMinimumSize(QSize(0, 0))
+        self.t_r_batt.setMaximumSize(QSize(16777215, 16777215))
+        self.t_r_batt.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.R_pkg, 5, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.t_r_batt, 8, 0, 1, 1)
 
-        self.R_on = QLabel(self.frame_2)
-        self.R_on.setObjectName(u"R_on")
-        self.R_on.setMinimumSize(QSize(100, 30))
-        self.R_on.setMaximumSize(QSize(100, 60))
-        self.R_on.setStyleSheet(u"color: rgb(67, 231, 163);")
-        self.R_on.setAlignment(Qt.AlignCenter)
+        self.R_batt_Bar = QProgressBar(self.frame_2)
+        self.R_batt_Bar.setObjectName(u"R_batt_Bar")
+        self.R_batt_Bar.setMinimumSize(QSize(0, 30))
+        self.R_batt_Bar.setMaximumSize(QSize(100, 16777215))
+        self.R_batt_Bar.setStyleSheet(u"QProgressBar{\n"
+"	\n"
+"	background-color: rgb(43, 59, 77);\n"
+"	color: rgb(210, 222, 226);\n"
+"	border-style: none;	\n"
+"	border-radius: 5px;\n"
+"	text-alignL center;\n"
+"}\n"
+"QProgressBar::chunk{\n"
+"	border-radius: 5px;\n"
+"	\n"
+"	background-color: rgb(56, 122, 71);\n"
+"}")
+        self.R_batt_Bar.setValue(100)
+        self.R_batt_Bar.setAlignment(Qt.AlignCenter)
+        self.R_batt_Bar.setTextVisible(True)
+        self.R_batt_Bar.setOrientation(Qt.Horizontal)
 
-        self.gridLayout_2.addWidget(self.R_on, 7, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.R_batt_Bar, 8, 1, 1, 1)
 
-        self.t_operation = QLabel(self.frame_2)
-        self.t_operation.setObjectName(u"t_operation")
-        self.t_operation.setMinimumSize(QSize(100, 30))
-        self.t_operation.setMaximumSize(QSize(100, 60))
-        self.t_operation.setStyleSheet(u"")
-        self.t_operation.setAlignment(Qt.AlignCenter)
+        self.R_alt_graph = QChartView(self.frame_2)
+        self.R_alt_graph.setObjectName(u"R_alt_graph")
+        sizePolicy.setHeightForWidth(self.R_alt_graph.sizePolicy().hasHeightForWidth())
+        self.R_alt_graph.setSizePolicy(sizePolicy)
+        self.R_alt_graph.setMinimumSize(QSize(350, 200))
+        self.R_alt_graph.setMaximumSize(QSize(350, 250))
 
-        self.gridLayout_2.addWidget(self.t_operation, 1, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.R_alt_graph, 4, 2, 5, 2)
 
-        self.C_on = QLabel(self.frame_2)
-        self.C_on.setObjectName(u"C_on")
-        self.C_on.setMinimumSize(QSize(100, 30))
-        self.C_on.setMaximumSize(QSize(100, 60))
-        self.C_on.setStyleSheet(u"color: rgb(67, 231, 163);")
-        self.C_on.setAlignment(Qt.AlignCenter)
+        self.R_velo_graph = QChartView(self.frame_2)
+        self.R_velo_graph.setObjectName(u"R_velo_graph")
+        self.R_velo_graph.setMinimumSize(QSize(350, 200))
+        self.R_velo_graph.setMaximumSize(QSize(350, 250))
 
-        self.gridLayout_2.addWidget(self.C_on, 2, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.R_velo_graph, 4, 6, 5, 3)
 
-        self.t_c_pkg = QLabel(self.frame_2)
-        self.t_c_pkg.setObjectName(u"t_c_pkg")
-        self.t_c_pkg.setMinimumSize(QSize(100, 30))
-        self.t_c_pkg.setMaximumSize(QSize(100, 60))
-        self.t_c_pkg.setAlignment(Qt.AlignCenter)
+        self.R_temp_graph = QChartView(self.frame_2)
+        self.R_temp_graph.setObjectName(u"R_temp_graph")
+        sizePolicy.setHeightForWidth(self.R_temp_graph.sizePolicy().hasHeightForWidth())
+        self.R_temp_graph.setSizePolicy(sizePolicy)
+        self.R_temp_graph.setMinimumSize(QSize(350, 200))
+        self.R_temp_graph.setMaximumSize(QSize(350, 250))
 
-        self.gridLayout_2.addWidget(self.t_c_pkg, 2, 0, 1, 1)
-
-        self.t_container_1 = QLabel(self.frame_2)
-        self.t_container_1.setObjectName(u"t_container_1")
-        self.t_container_1.setMinimumSize(QSize(200, 50))
-        self.t_container_1.setMaximumSize(QSize(16777215, 60))
-        self.t_container_1.setAutoFillBackground(False)
-        self.t_container_1.setStyleSheet(u"font: 800 24pt \"Apple SD Gothic Neo\";\n"
-"alternate-background-color: rgba(255, 255, 255, 100);\n"
-"background-color: none;\n"
-"border-radius: 10px;\n"
-"")
-        self.t_container_1.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.t_container_1, 0, 0, 1, 2)
-
-        self.C_velo = QLabel(self.frame_2)
-        self.C_velo.setObjectName(u"C_velo")
-        self.C_velo.setMinimumSize(QSize(150, 30))
-        self.C_velo.setMaximumSize(QSize(150, 30))
-        self.C_velo.setStyleSheet(u"color: rgb(242, 48, 106);")
-        self.C_velo.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.C_velo, 3, 7, 1, 1)
+        self.gridLayout_2.addWidget(self.R_temp_graph, 4, 4, 5, 2)
 
         self.t_az = QLabel(self.frame_2)
         self.t_az.setObjectName(u"t_az")
         self.t_az.setMinimumSize(QSize(100, 30))
-        self.t_az.setMaximumSize(QSize(100, 30))
+        self.t_az.setMaximumSize(QSize(123123, 123123))
         self.t_az.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.t_az, 14, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.t_az, 14, 0, 1, 2)
 
         self.Azimuth = QLabel(self.frame_2)
         self.Azimuth.setObjectName(u"Azimuth")
@@ -1072,31 +1015,15 @@ class Ui_GrounStation(object):
         self.Azimuth.setStyleSheet(u"color: rgb(242, 48, 106);")
         self.Azimuth.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.Azimuth, 14, 3, 1, 1)
+        self.gridLayout_2.addWidget(self.Azimuth, 14, 2, 1, 1)
 
-        self.R_temp_graph = QChartView(self.frame_2)
-        self.R_temp_graph.setObjectName(u"R_temp_graph")
-        sizePolicy.setHeightForWidth(self.R_temp_graph.sizePolicy().hasHeightForWidth())
-        self.R_temp_graph.setSizePolicy(sizePolicy)
-        self.R_temp_graph.setMinimumSize(QSize(350, 200))
-        self.R_temp_graph.setMaximumSize(QSize(350, 200))
+        self.t_ele = QLabel(self.frame_2)
+        self.t_ele.setObjectName(u"t_ele")
+        self.t_ele.setMinimumSize(QSize(100, 30))
+        self.t_ele.setMaximumSize(QSize(123123, 123123))
+        self.t_ele.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.R_temp_graph, 4, 4, 4, 2)
-
-        self.graphicsView_2 = QChartView(self.frame_2)
-        self.graphicsView_2.setObjectName(u"graphicsView_2")
-        self.graphicsView_2.setMinimumSize(QSize(350, 200))
-        self.graphicsView_2.setMaximumSize(QSize(350, 200))
-
-        self.gridLayout_2.addWidget(self.graphicsView_2, 4, 6, 4, 2)
-
-        self.Sight = QLabel(self.frame_2)
-        self.Sight.setObjectName(u"Sight")
-        self.Sight.setMinimumSize(QSize(100, 30))
-        self.Sight.setMaximumSize(QSize(100, 30))
-        self.Sight.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.Sight, 14, 7, 1, 1)
+        self.gridLayout_2.addWidget(self.t_ele, 14, 3, 1, 1)
 
         self.Elevation = QLabel(self.frame_2)
         self.Elevation.setObjectName(u"Elevation")
@@ -1104,32 +1031,7 @@ class Ui_GrounStation(object):
         self.Elevation.setMaximumSize(QSize(100, 30))
         self.Elevation.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_2.addWidget(self.Elevation, 14, 5, 1, 1)
-
-        self.t_sight = QLabel(self.frame_2)
-        self.t_sight.setObjectName(u"t_sight")
-        self.t_sight.setMinimumSize(QSize(100, 30))
-        self.t_sight.setMaximumSize(QSize(100, 30))
-        self.t_sight.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.t_sight, 14, 6, 1, 1)
-
-        self.t_ele = QLabel(self.frame_2)
-        self.t_ele.setObjectName(u"t_ele")
-        self.t_ele.setMinimumSize(QSize(100, 30))
-        self.t_ele.setMaximumSize(QSize(100, 30))
-        self.t_ele.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.t_ele, 14, 4, 1, 1)
-
-        self.R_velo = QLabel(self.frame_2)
-        self.R_velo.setObjectName(u"R_velo")
-        self.R_velo.setMinimumSize(QSize(150, 30))
-        self.R_velo.setMaximumSize(QSize(150, 30))
-        self.R_velo.setStyleSheet(u"color: rgb(242, 48, 106);")
-        self.R_velo.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_2.addWidget(self.R_velo, 10, 7, 1, 1)
+        self.gridLayout_2.addWidget(self.Elevation, 14, 4, 1, 1)
 
         self.frame5 = QFrame(self.frame_2)
         self.frame5.setObjectName(u"frame5")
@@ -1186,7 +1088,7 @@ class Ui_GrounStation(object):
         self.gridLayout_4.addWidget(self.AQI, 3, 1, 1, 1)
 
 
-        self.gridLayout_2.addWidget(self.frame5, 4, 8, 4, 2)
+        self.gridLayout_2.addWidget(self.frame5, 4, 9, 5, 2)
 
 
         self.gridLayout_3.addWidget(self.frame_2, 0, 1, 1, 1)
@@ -1243,93 +1145,76 @@ class Ui_GrounStation(object):
         self.t_rocket.setText(QCoreApplication.translate("GrounStation", u"ROCKET", None))
         self.portlist.setItemText(0, QCoreApplication.translate("GrounStation", u"COM11", None))
 
-        self.t_gd.setText(QCoreApplication.translate("GrounStation", u"Ground Distance", None))
-        self.GD.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
-        self.GD.setText(QCoreApplication.translate("GrounStation", u"0", None))
-        self.C_oriz_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
+        self.t_heading.setText(QCoreApplication.translate("GrounStation", u"Heading", None))
+        self.t_sight.setText(QCoreApplication.translate("GrounStation", u"Sight", None))
+        self.Heading.setText(QCoreApplication.translate("GrounStation", u"0", None))
+        self.C_gyroz_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
         self.t_c_acc_z.setText(QCoreApplication.translate("GrounStation", u"ACC z", None))
         self.C_accy_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
         self.C_accx_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
-        self.t_c_orien_z.setText(QCoreApplication.translate("GrounStation", u"ORIEN z", None))
+        self.t_c_gyro_z.setText(QCoreApplication.translate("GrounStation", u"GYRO z", None))
         self.t_c_acc_x.setText(QCoreApplication.translate("GrounStation", u"ACC x", None))
-        self.R_oriz_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
-        self.t_r_orien_z.setText(QCoreApplication.translate("GrounStation", u"ORIEN z", None))
+        self.R_gyroz_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
+        self.t_r_gyro_z.setText(QCoreApplication.translate("GrounStation", u"GYRO z", None))
         self.t_mui.setText(QCoreApplication.translate("GrounStation", u"GNSS & IMU", None))
         self.t_r_acc_y.setText(QCoreApplication.translate("GrounStation", u"ACC y", None))
-        self.t_c_orien_y.setText(QCoreApplication.translate("GrounStation", u"ORIEN y", None))
+        self.t_c_gyro_y.setText(QCoreApplication.translate("GrounStation", u"GYRO y", None))
         self.C_accz_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
-        self.R_orix_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
+        self.R_gyrox_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
         self.t_c_acc_y.setText(QCoreApplication.translate("GrounStation", u"ACC y", None))
-        self.t_r_orien_x.setText(QCoreApplication.translate("GrounStation", u"ORIEN x", None))
+        self.t_r_gyro_x.setText(QCoreApplication.translate("GrounStation", u"GYRO x", None))
         self.t_r_acc_x.setText(QCoreApplication.translate("GrounStation", u"ACC x", None))
-        self.t_c_orien_x.setText(QCoreApplication.translate("GrounStation", u"ORIEN x", None))
+        self.t_c_gyro_x.setText(QCoreApplication.translate("GrounStation", u"GYRO x", None))
         self.R_accx_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
         self.R_accy_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
-        self.R_oriy_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
+        self.R_gyroy_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
         self.R_accz_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
-        self.C_orix_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
+        self.C_gyrox_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
         self.t_r_acc_z.setText(QCoreApplication.translate("GrounStation", u"ACC z", None))
-        self.C_oriy_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
-        self.t_r_orien_y.setText(QCoreApplication.translate("GrounStation", u"ORIEN y", None))
+        self.C_gyroy_bar.setFormat(QCoreApplication.translate("GrounStation", u"%v", None))
+        self.t_r_gyro_y.setText(QCoreApplication.translate("GrounStation", u"GYRO y", None))
         self.t_c_lat.setText(QCoreApplication.translate("GrounStation", u" Latitude", None))
-        self.C_lat.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
-        self.C_lat.setText(QCoreApplication.translate("GrounStation", u"0", None))
-        self.R_lat.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
-        self.R_lat.setText(QCoreApplication.translate("GrounStation", u"0", None))
+        self.C_latitude.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
+        self.C_latitude.setText(QCoreApplication.translate("GrounStation", u"0", None))
+        self.R_latitude.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
+        self.R_latitude.setText(QCoreApplication.translate("GrounStation", u"0", None))
         self.t_r_lat.setText(QCoreApplication.translate("GrounStation", u"Latitude", None))
         self.t_c_long.setText(QCoreApplication.translate("GrounStation", u"Longitude", None))
-        self.C_long.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
-        self.C_long.setText(QCoreApplication.translate("GrounStation", u"0", None))
+        self.C_longitude.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
+        self.C_longitude.setText(QCoreApplication.translate("GrounStation", u"0", None))
         self.t_r_long.setText(QCoreApplication.translate("GrounStation", u"Longitude", None))
-        self.R_long.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
-        self.R_long.setText(QCoreApplication.translate("GrounStation", u"0", None))
+        self.R_longitude.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
+        self.R_longitude.setText(QCoreApplication.translate("GrounStation", u"0", None))
         self.t_rocket_2.setText(QCoreApplication.translate("GrounStation", u"ROCKET", None))
         self.t_container_2.setText(QCoreApplication.translate("GrounStation", u"CONTAINER", None))
-        self.label_5.setText(QCoreApplication.translate("GrounStation", u"Velocity", None))
-        self.label_7.setText(QCoreApplication.translate("GrounStation", u"Velocity", None))
-        self.t_c_humidity.setText(QCoreApplication.translate("GrounStation", u"Humidity", None))
-        self.t_c_temp.setText(QCoreApplication.translate("GrounStation", u"Temperature", None))
-        self.R_batt_Bar.setFormat(QCoreApplication.translate("GrounStation", u"%p", None))
-        self.R_temp.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
-        self.R_temp.setText(QCoreApplication.translate("GrounStation", u"0", None))
-        self.t_c_batt.setText(QCoreApplication.translate("GrounStation", u"Battery", None))
-        self.t_r_batt.setText(QCoreApplication.translate("GrounStation", u"Battery", None))
-        self.C_batt_Bar.setFormat(QCoreApplication.translate("GrounStation", u"%p", None))
-        self.C_temp.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
-        self.C_temp.setText(QCoreApplication.translate("GrounStation", u"0", None))
-        self.t_rocket_1.setText(QCoreApplication.translate("GrounStation", u"ROCKET", None))
-        self.R_alt.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
-        self.R_alt.setText(QCoreApplication.translate("GrounStation", u"0", None))
-        self.t_apogee.setText(QCoreApplication.translate("GrounStation", u"PEAK :", None))
-        self.C_alt.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
-        self.C_alt.setText(QCoreApplication.translate("GrounStation", u"0", None))
-        self.t_r_alt.setText(QCoreApplication.translate("GrounStation", u"Altitude", None))
-        self.t_c_alt.setText(QCoreApplication.translate("GrounStation", u"Altitude", None))
-        self.t_r_temp.setText(QCoreApplication.translate("GrounStation", u"Temperature", None))
-        self.t_r_pkg.setText(QCoreApplication.translate("GrounStation", u"PKG :", None))
-        self.C_pkg.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
-        self.C_pkg.setText(QCoreApplication.translate("GrounStation", u"0", None))
-        self.C_humidity.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
-        self.C_humidity.setText(QCoreApplication.translate("GrounStation", u"0", None))
-        self.apogee.setText(QCoreApplication.translate("GrounStation", u"0", None))
-        self.t_r_on.setText(QCoreApplication.translate("GrounStation", u"OPR : ", None))
+        self.t_c_pkg.setText(QCoreApplication.translate("GrounStation", u"OPR : ", None))
+        self.t_container_1.setText(QCoreApplication.translate("GrounStation", u"CANSAT", None))
+        self.C_on.setText(QCoreApplication.translate("GrounStation", u"NO", None))
+        self.t_operation.setText(QCoreApplication.translate("GrounStation", u"PKG :", None))
         self.R_pkg.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
         self.R_pkg.setText(QCoreApplication.translate("GrounStation", u"0", None))
         self.R_on.setText(QCoreApplication.translate("GrounStation", u"NO", None))
-        self.t_operation.setText(QCoreApplication.translate("GrounStation", u"PKG :", None))
-        self.C_on.setText(QCoreApplication.translate("GrounStation", u"NO", None))
-        self.t_c_pkg.setText(QCoreApplication.translate("GrounStation", u"OPR : ", None))
-        self.t_container_1.setText(QCoreApplication.translate("GrounStation", u"CANSAT", None))
-        self.C_velo.setText(QCoreApplication.translate("GrounStation", u"0", None))
-        self.t_az.setText(QCoreApplication.translate("GrounStation", u"Azimuth", None))
-        self.Azimuth.setText(QCoreApplication.translate("GrounStation", u"0", None))
+        self.t_r_on.setText(QCoreApplication.translate("GrounStation", u"OPR : ", None))
+        self.t_c_batt.setText(QCoreApplication.translate("GrounStation", u"Battery", None))
+        self.t_rocket_1.setText(QCoreApplication.translate("GrounStation", u"ROCKET", None))
+        self.C_batt_Bar.setFormat(QCoreApplication.translate("GrounStation", u"%p", None))
+        self.GD.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
+        self.GD.setText(QCoreApplication.translate("GrounStation", u"0", None))
+        self.t_gd.setText(QCoreApplication.translate("GrounStation", u"GD.", None))
+        self.t_r_pkg.setText(QCoreApplication.translate("GrounStation", u"PKG :", None))
+        self.C_pkg.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
+        self.C_pkg.setText(QCoreApplication.translate("GrounStation", u"0", None))
+        self.t_apogee.setText(QCoreApplication.translate("GrounStation", u"PEAK :", None))
+        self.apogee.setText(QCoreApplication.translate("GrounStation", u"0", None))
         self.Sight.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
         self.Sight.setText(QCoreApplication.translate("GrounStation", u"0", None))
+        self.t_r_batt.setText(QCoreApplication.translate("GrounStation", u"Battery", None))
+        self.R_batt_Bar.setFormat(QCoreApplication.translate("GrounStation", u"%p", None))
+        self.t_az.setText(QCoreApplication.translate("GrounStation", u"Azimuth", None))
+        self.Azimuth.setText(QCoreApplication.translate("GrounStation", u"0", None))
+        self.t_ele.setText(QCoreApplication.translate("GrounStation", u"Elevation", None))
         self.Elevation.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
         self.Elevation.setText(QCoreApplication.translate("GrounStation", u"0", None))
-        self.t_sight.setText(QCoreApplication.translate("GrounStation", u"Sight", None))
-        self.t_ele.setText(QCoreApplication.translate("GrounStation", u"Elevation", None))
-        self.R_velo.setText(QCoreApplication.translate("GrounStation", u"0", None))
         self.PM10.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
         self.PM10.setText(QCoreApplication.translate("GrounStation", u"0", None))
         self.PM25.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
@@ -1340,6 +1225,6 @@ class Ui_GrounStation(object):
         self.t_aqi.setText(QCoreApplication.translate("GrounStation", u"AQI", None))
         self.AQI.setStyleSheet(QCoreApplication.translate("GrounStation", u"color: rgb(242, 48, 106);", None))
         self.AQI.setText(QCoreApplication.translate("GrounStation", u"0", None))
-        self.copyright.setText(QCoreApplication.translate("GrounStation", u"Ground station for Alien sat by space AC for Thailand CanSat competition V0.3", None))
+        self.copyright.setText(QCoreApplication.translate("GrounStation", u"Ground station for Alien sat by space AC for Thailand CanSat competition V 0.5", None))
     # retranslateUi
 
