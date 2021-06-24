@@ -7,6 +7,7 @@ from UI_splashscreen import Ui_MainWindow as UI_splashscreen
 from UI_Function import *
 import sys
 import threading
+from PySide6.QtCharts import *
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtGui import *
 from PySide6.QtCore import *
@@ -108,10 +109,6 @@ class SplashScreen(QMainWindow):
 
 
 class ThreadMain(QThread):
-    # @Slot(float, result=int,)
-    # def get(self,f):
-    #     return int(f)
-
     carrier1 = QtCore.Signal(object)
     carrier2 = QtCore.Signal(object)
     carrier3 = QtCore.Signal(object)
@@ -130,16 +127,16 @@ class ThreadMain(QThread):
         while True:
             self.pkg = self.port.reading()
             print(f"[THREAD_IN] : {self.pkg}")
-            if self.pkg[3] == 'C':
+            if self.pkg[0] == 'C':
                 print('[CANSAT]', end="")
                 self.pkg1 = self.pkg[:]
                 self.carrier1.emit(self.pkg1)
-            elif self.pkg[3] == 'SP1':
-                print('[PAYLOAD1]', end="")
+            elif self.pkg[0] == 'R':
+                print('[ROCKET]', end="")
                 self.pkg2 = self.pkg[:]
                 self.carrier2.emit(self.pkg2)
-            elif self.pkg[3] == 'SP2':
-                print('[PAYLOAD2]', end="")
+            elif self.pkg[0] == 'G':
+                print('[GROUND]', end="")
                 self.pkg3 = self.pkg[:]
                 self.carrier3.emit(self.pkg3)
 
@@ -171,6 +168,19 @@ class ThreadTimer(QThread):
 
 class Controller:
     def __init__(self):
+        self.spline_alt, self.spline_temp, self.spline_vel, self.spline_hum, self.spline_altr, self.spline_tempr, self.spline_velr = (
+            QSplineSeries(), QSplineSeries(), QSplineSeries(), QSplineSeries(), QSplineSeries(), QSplineSeries(),
+            QSplineSeries())
+        self.point_alt, self.point_temp, self.point_vel, self.point_hum, self.point_altr, self.point_tempr, self.point_velr = (
+            QScatterSeries(), QScatterSeries(), QScatterSeries(), QScatterSeries(), QScatterSeries(), QScatterSeries(),
+            QScatterSeries())
+        self.chart_alt, self.chart_temp, self.chart_vel, self.chart_hum, self.chart_altr, self.chart_tempr, self.chart_velr = (
+            QChart(), QChart(), QChart(), QChart(), QChart(), QChart(), QChart())
+        self.axisX_alt, self.axisX_temp, self.axisX_vel, self.axisX_hum, self.axisX_altr, self.axisX_tempr, self.axisX_velr = (
+            QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis())
+        self.axisY_alt, self.axisY_temp, self.axisY_vel, self.axisY_hum, self.axisY_altr, self.axisY_tempr, self.axisY_velr = (
+            QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis())
+
         self.show_splash()
         self.setup()
 
@@ -196,6 +206,7 @@ class Controller:
     def show_ui(self):
         self.window_ui = QtWidgets.QMainWindow()
         self.ui_main = MainWindow()
+        self.set_graph()
         print('[MAINWINDOW]', end="")
 
     def start_clock(self):
@@ -217,6 +228,113 @@ class Controller:
     def update_elapsed(self, time):
         self.ui_main.ui.Elapsed.setText(time)
 
+    def set_graph(self):
+        self.color = QColor(217, 17, 194)
+        self.pen = QPen(self.color)
+        self.pen.setWidth(2)
+
+        self.C_ALT = {"GRAPH": self.ui_main.ui.C_alt_graph,
+                      "LINE": self.spline_alt,
+                      "POINT": self.point_alt,
+                      "CHART": self.chart_alt,
+                      "X-AXIS": self.axisX_alt,
+                      "Y-AXIS": self.axisY_alt,
+                      "TITLE": f"Altitude {self.c['ALT']}M",
+                      "X": self.c["PKG"],
+                      "y": self.c["ALT"]}
+
+        self.C_TEMP = {"GRAPH": self.ui_main.ui.C_temp_graph,
+                       "LINE": self.spline_temp,
+                       "POINT": self.point_temp,
+                       "CHART": self.chart_temp,
+                       "X-AXIS": self.axisX_temp,
+                       "Y-AXIS": self.axisY_temp,
+                       "TITLE": f"Temperature {self.c['TEM']}C",
+                       "X": self.c["PKG"],
+                       "y": self.c["TEM"]}
+
+        self.C_VEL = {"GRAPH": self.ui_main.ui.C_velo_graph,
+                      "LINE": self.spline_vel,
+                      "POINT": self.point_vel,
+                      "CHART": self.chart_vel,
+                      "X-AXIS": self.axisX_vel,
+                      "Y-AXIS": self.axisY_vel,
+                      "TITLE": f'Velocity {self.to_vel(self.c["ACX"],self.c["ACY"],self.c["ACZ"])} m/s',
+                      "X": self.c["PKG"],
+                      "y": self.to_vel(self.c["ACX"],self.c["ACY"],self.c["ACZ"])}
+
+        self.C_HUM = {"GRAPH": self.ui_main.ui.C_humid_graph,
+                      "LINE": self.spline_hum,
+                      "POINT": self.point_hum,
+                      "CHART": self.chart_hum,
+                      "X-AXIS": self.axisX_hum,
+                      "Y-AXIS": self.axisY_hum,
+                      "TITLE": f"HUMIDITY {self.c['HUM']} %",
+                      "X": self.c["PKG"],
+                      "y": self.c["HUM"]}
+        self.R_ALT = {"GRAPH": self.ui_main.ui.R_alt_graph,
+                      "LINE": self.spline_altr,
+                      "POINT": self.point_altr,
+                      "CHART": self.chart_altr,
+                      "X-AXIS": self.axisX_altr,
+                      "Y-AXIS": self.axisY_altr,
+                      "TITLE": f"ALTITUDE {self.r['ALT']} M",
+                      "X": self.r["PKG"],
+                      "y": self.r["ALT"]}
+
+        self.R_TEMP = {"GRAPH": self.ui_main.ui.R_temp_graph,
+                       "LINE": self.spline_tempr,
+                       "POINT": self.point_tempr,
+                       "CHART": self.chart_tempr,
+                       "X-AXIS": self.axisX_tempr,
+                       "Y-AXIS": self.axisY_tempr,
+                       "TITLE": f"HUMIDITY {self.r['TEM']} %",
+                       "X": self.r["PKG"],
+                       "y": self.r["TEM"]}
+
+        self.R_VEL = {"GRAPH": self.ui_main.ui.R_velo_graph,
+                      "LINE": self.spline_velr,
+                      "POINT": self.point_velr,
+                      "CHART": self.chart_velr,
+                      "X-AXIS": self.axisX_velr,
+                      "Y-AXIS": self.axisY_velr,
+                      "TITLE": f'VELOCITY {self.to_vel(self.r["ACX"],self.r["ACY"],self.r["ACZ"])} %',
+                      "X": self.c["PKG"],
+                      "y": self.to_vel(self.r["ACX"],self.r["ACY"],self.r["ACZ"])}
+
+        self.GRAPH = [self.C_ALT, self.C_TEMP, self.C_VEL, self.C_HUM, self.R_ALT, self.R_TEMP, self.R_VEL]
+
+        for item in self.GRAPH:
+            item["GRAPH"].setRenderHint(QPainter.Antialiasing)
+            item["CHART"].legend().setVisible(False)
+            item["CHART"].setDropShadowEnabled(True)
+            item["CHART"].setAnimationOptions(QChart.SeriesAnimations)
+            item["CHART"].setTheme(QChart.ChartThemeDark)
+            item["CHART"].createDefaultAxes()
+            item["X-AXIS"].setRange(0,100)
+            item["Y-AXIS"].setRange(0,100)
+            item["CHART"].setAxisX(item["X-AXIS"], item["LINE"])
+            item["CHART"].setAxisY(item["Y-AXIS"], item["LINE"])
+            item["CHART"].addSeries(item["LINE"])
+            item["CHART"].addSeries(item["POINT"])
+            item["CHART"].setTitle(item["TITLE"])
+            item["GRAPH"].setChart(item["CHART"])
+
+    def update_graph(self, item):
+        item["LINE"].append(item["X"],item["Y"])
+        item["POINT"].append(item["X"],item["Y"])
+        item["X-AXIS"].setRange(min(item["X"]), max(item["X"]))
+        item["Y-AXIS"].setRange(min(item["Y"]), max(item["Y"]))
+        item["CHART"].setAxisX(item["X-AXIS"], item["LINE"])
+        item["CHART"].setAxisY(item["Y-AXIS"], item["LINE"])
+        item["CHART"].addSeries(item["LINE"])
+        item["CHART"].addSeries(item["POINT"])
+        item["CHART"].setTitle(item["TITLE"])
+        item["GRAPH"].setChart(item["CHART"])
+        item["LINE"].setPen(self.pen)
+        item["POINT"].setColor(self.color)
+        item["POINT"].setMarkerSize(8)
+
     def update_cansat(self, data):
         self.c["PKG"] = int(data[1])
         self.c["ALT"] = float(data[2])
@@ -234,6 +352,7 @@ class Controller:
         self.c["ORX"] = float(data[14])
         self.c["ORY"] = float(data[15])
         self.c["ORZ"] = float(data[16])
+        self.update_main()
 
     def update_rocket(self, data):
         self.r["PKG"] = int(data[1])
@@ -248,6 +367,7 @@ class Controller:
         self.r["ORX"] = float(data[10])
         self.r["ORY"] = float(data[11])
         self.r["ORZ"] = float(data[12])
+        self.update_main()
 
     def update_ground(self, data):
         self.g["LAT"] = float(data[1])
@@ -283,25 +403,17 @@ class Controller:
 
     def update_text(self):
         self.ui_main.ui.C_pkg.setText(str(self.c["PKG"]))
-        self.ui_main.ui.C_alt.setText(f'{self.c["ALT"]} M.')
-        self.ui_main.ui.C_temp.setText(f'{self.c["TEM"]} C')
-        self.ui_main.ui.C_humidity.setText(f'{self.c["HUM"]} %')
-        self.ui_main.ui.C_velo.setText(f'{math.sqrt(math.pow(self.c["ACX"],2)+math.pow(self.c["ACY"],2)+math.pow(self.c["ACZ"],2))} %')
-
         self.ui_main.ui.PM10.setText(f'{self.c["P10"]} ug/m3')
         self.ui_main.ui.PM25.setText(f'{self.c["P25"]} ug/m3')
         self.ui_main.ui.AQI.setText(f'{(self.c["P25"] + self.c["P10"]) / 2} ug/m3')
-
         self.ui_main.ui.R_pkg.setText({self.r["PKG"]})
-        self.ui_main.ui.R_alt.setText(f'{self.r["ALT"]} M.')
-        self.ui_main.ui.R_temp.setText(f'{self.r["TEM"]} C')
-        self.ui_main.ui.R_velo.setText(f'{math.sqrt(math.pow(self.r["ACX"], 2) + math.pow(self.r["ACY"], 2) + math.pow(self.r["ACZ"], 2))} %')
 
-    def update_graph(self):
-        pass
-
+    @staticmethod
+    def to_vel(a,b,c):
+        vel = math.sqrt((a*a)+(b*b)+(c*c))
+        return vel
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     Window = Controller()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

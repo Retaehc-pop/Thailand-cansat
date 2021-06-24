@@ -1,5 +1,4 @@
 from main import *
-import pyqtgraph as pg
 
 GLOBAL_STATE = 0
 GLOBAL_STATE_TABLE = 0
