@@ -1,5 +1,5 @@
 import time
-
+import random
 import paho.mqtt.client as mqtt
 
 
@@ -37,26 +37,70 @@ def Initialise_client():
 
 
 def sendserver(mqttc, Data):
-     mqttc.publish('altitude_c', Data[0])
+    if Data[0] == "C":
+        mqttc.publish('Altitude_c', Data[2])
+        mqttc.publish('Temperature_c', Data[5])
+        mqttc.publish('Battery_c', Data[8])
+        mqttc.publish('Humidity_c', Data[6])
+        mqttc.publish('Pressure_c', Data[7])
+        mqttc.publish('PM10_c', Data[9])
+        mqttc.publish('PM25_c', Data[10])
+        mqttc.publish('lat_c', Data[3])
+        mqttc.publish('lon_c', Data[4])
+        mqttc.publish('Accx_c', Data[11])
+        mqttc.publish('Accy_c', Data[12])
+        mqttc.publish('Accz_c', Data[13])
+        mqttc.publish('Gyrox_c', Data[14])
+        mqttc.publish('Gyroy_c', Data[15])
+        mqttc.publish('Gyroz_c', Data[16])
+    elif Data[0] == "R":
+        mqttc.publish('Altitude_r', Data[2])
+        mqttc.publish('Temperature_r', Data[5])
+        mqttc.publish('Battery_r', Data[6])
+        mqttc.publish('lat_r', Data[3])
+        mqttc.publish('lon_r', Data[4])
+        mqttc.publish('Accx_r', Data[7])
+        mqttc.publish('Accy_r', Data[8])
+        mqttc.publish('Accz_r', Data[9])
+        mqttc.publish('Gyrox_r', Data[10])
+        mqttc.publish('Gyroy_r', Data[11])
+        mqttc.publish('Gyroz_r', Data[12])
+    time.sleep(0.01)
 
 
 def test():
-    C = "3751,15:28:44,227,C,F,R,N,2.93,30.03,3.46,00:00:00,0.000000,0.000000,0.00,0,RELEASED_1,0,0,CXON"
-    S1 = "3751,00:00:00,176,SP1,10.57,28.57,0.60,0.000000,0.000000,9.77,1.41,0.52"
-    S2 = "3751,00:00:00,783,SP2,0.89,35.57,240.52,0.000000,0.000000,9.66,0.39,-0.57"
+    i=0
     while True:
-        time.sleep(0.1)
-        mqttc.publish('teams/3751', C)  # send the line of data
-        print(C)
-        time.sleep(0.1)
-        mqttc.publish('teams/3751', S1)  # send the line of data
-        print(S1)
-        time.sleep(0.1)
-        mqttc.publish('teams/3751', S2)  # send the line of data
-        print(S2)
-        time.sleep(0.7)
-        print("pingsen")
+        i+=1
+        mqttc.publish('Altitude_c',str(random.randint(0,100)))
+        mqttc.publish('Temperature_c',str(random.randint(0,100)))
+        mqttc.publish('Battery_c', str(random.randint(0,100)))
+        mqttc.publish('Humidity_c',str(random.randint(0,100)))
+        mqttc.publish('Pressure_c',str(random.randint(0,100)))
+        mqttc.publish('PM10_c',str(random.randint(0,100)))
+        mqttc.publish('PM25_c',str(random.randint(0,100)))
+        mqttc.publish('lat_c',str(random.randint(0,100)))
+        mqttc.publish('lon_c',str(random.randint(0,100)))
+        mqttc.publish('Accx_c',str(random.randint(0,100)))
+        mqttc.publish('Accy_c',str(random.randint(0,100)))
+        mqttc.publish('Accz_c',str(random.randint(0,100)))
+        mqttc.publish('Gyrox_c',str(random.randint(0,100)))
+        mqttc.publish('Gyroy_c',str(random.randint(0,100)))
+        mqttc.publish('Gyroz_c',str(random.randint(0,100)))
 
+        mqttc.publish('Altitude_r', str(random.randint(0,100)))
+        mqttc.publish('Temperature_r', str(random.randint(0,100)))
+        mqttc.publish('Battery_r', str(random.randint(0,100)))
+        mqttc.publish('lat_r', str(random.randint(0,100)))
+        mqttc.publish('lon_r', str(random.randint(0,100)))
+        mqttc.publish('Accx_r', str(random.randint(0,100)))
+        mqttc.publish('Accy_r', str(random.randint(0,100)))
+        mqttc.publish('Accz_r', str(random.randint(0,100)))
+        mqttc.publish('Gyrox_r', str(random.randint(0,100)))
+        mqttc.publish('Gyroy_r', str(random.randint(0,100)))
+        mqttc.publish('Gyroz_r', str(random.randint(0,100)))
+        time.sleep(1)
+        print(i)
 
 if __name__ == "__main__":
     mqttc = Initialise_client()
