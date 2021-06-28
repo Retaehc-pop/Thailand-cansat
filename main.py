@@ -2,6 +2,7 @@ import Port
 import serial
 import math
 import RTC
+import mqtt
 from ui_main import Ui_GrounStation as UI_MainWindow
 from UI_splashscreen import Ui_MainWindow as UI_splashscreen
 from UI_Function import *
@@ -221,6 +222,7 @@ class Controller:
         self.worker_serial.carrier1.connect(self.update_cansat)
         self.worker_serial.carrier2.connect(self.update_rocket)
         self.worker_serial.carrier3.connect(self.update_ground)
+        self.mqtt = mqtt.Initialise_client()
         self.worker_serial.start()
 
     def update_time(self, time):
@@ -356,6 +358,7 @@ class Controller:
         self.c["GYZ"] = float(data[16])
         self.thread_c = threading.Thread(target=self.update_c)
         self.thread_c.start()
+        mqtt.sendserver(self.mqtt,data)
 
     def update_rocket(self, data):
         self.r["PKG"] = int(data[1])
@@ -372,6 +375,7 @@ class Controller:
         self.r["GYZ"] = float(data[12])
         self.thread_r = threading.Thread(target=self.update_r)
         self.thread_r.start()
+        mqtt.sendserver(self.mqtt, data)
 
     def update_ground(self, data):
         self.g["LAT"] = float(data[1])
