@@ -313,7 +313,7 @@ class Controller:
             item["CHART"].legend().setVisible(False)
             item["CHART"].setDropShadowEnabled(True)
             item["CHART"].setAnimationOptions(QChart.SeriesAnimations)
-            item["CHART"].setTheme(QChart.ChartThemeDark)
+            item["CHART"].setTheme(QChart.ChartThemeBrownSand)
             item["CHART"].createDefaultAxes()
             item["X-AXIS"].setRange(0, 100)
             item["Y-AXIS"].setRange(0, 100)
