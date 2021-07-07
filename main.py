@@ -24,7 +24,7 @@ class MainWindow(QMainWindow):
         self.connect_btn()
         self.refresh()
 
-        def move_window(self, event):
+        def move_window(event):
             if UiFunctions.return_status(self) == 1:
                 UiFunctions.maximize_restore(self)
 
@@ -43,6 +43,7 @@ class MainWindow(QMainWindow):
     def connect_btn(self):
         self.ui.btn_connect.clicked.connect(self.online)
         self.ui.btn_refresh.clicked.connect(self.refresh)
+        self.ui.pushButton.clicked.connect(Window.start_mqtt)
         self.ui.btn_clear.clicked.connect(self.clear())
         self.ui.btn_c_on.clicked.connect(lambda: self.cmd('C_ON'))
         self.ui.btn_c_off.clicked.connect(lambda: self.cmd('C_OF'))
@@ -151,8 +152,6 @@ class ThreadMain(QThread):
 
 class ThreadTimer(QThread):
     time_carrier = QtCore.Signal(object)
-    elapsed_carrier = QtCore.Signal(object)
-
     def __init__(self, parent=None):
         self._isRunning = True
         super(ThreadTimer, self).__init__(parent)
@@ -170,25 +169,88 @@ class ThreadTimer(QThread):
         self._isRunning = False
         self.terminate()
 
+class ThreadElaps(QThread):
+    elapsed_carrier = QtCore.Signal(object)
+
+    def __init__(self, parent=None):
+        self._isRunning = True
+        super(ThreadElaps, self).__init__(parent)
+
+    def __del__(self):
+        self.wait()
+
+    def run(self):
+        clock = RTC.GetTime()
+        while True:
+            self.elapsed_carrier.emit(clock.time_elapsed())
+
+    def stop(self):
+        self._isRunning = False
+        self.terminate()
+
+
+class Chart:
+    def __init__(self, Graph: QChartView, Title: str, unit: str):
+        self.color = QColor(217, 17, 194)
+        self.pen = QPen(self.color)
+        self.pen.setWidth(2)
+
+        self.LINE = QSplineSeries()
+        self.POINT = QScatterSeries()
+        self.CHART = QChart()
+        self.X_AXIS = QValueAxis()
+        self.Y_AXIS = QValueAxis()
+        self.Graph = Graph
+
+        self.Title = Title
+        self.Unit = unit
+        self.x = []
+        self.y = []
+
+        self.Graph.setRenderHint(QPainter.Antialiasing)
+        self.CHART.legend().setVisible(False)
+        self.CHART.setDropShadowEnabled(True)
+        self.CHART.setAnimationOptions(QChart.SeriesAnimations)
+        self.CHART.setTheme(QChart.ChartThemeBrownSand)
+        self.CHART.createDefaultAxes()
+        self.X_AXIS.setRange(0, 100)
+        self.Y_AXIS.setRange(0, 100)
+        self.CHART.setAxisX(self.X_AXIS, self.LINE)
+        self.CHART.setAxisY(self.Y_AXIS, self.LINE)
+        self.CHART.addSeries(self.LINE)
+        self.CHART.addSeries(self.POINT)
+        self.CHART.setTitle(f"{self.Title} 0 {self.Unit}")
+        self.Graph.setChart(self.CHART)
+
+    def clear(self):
+        self.LINE.clear()
+        self.POINT.clear()
+
+    def plot(self, x, y):
+        self.x.append(x)
+        self.y.append(y)
+
+        self.LINE.append(x, y)
+        self.POINT.append(x, y)
+        self.X_AXIS.setRange(min(self.x), max(self.x))
+        self.Y_AXIS.setRange(min(self.y), max(self.y))
+        self.CHART.setAxisX(self.X_AXIS, self.LINE)
+        self.CHART.setAxisY(self.Y_AXIS, self.LINE)
+        self.CHART.addSeries(self.LINE)
+        self.CHART.addSeries(self.POINT)
+        self.CHART.setTitle(f"{self.Title}{x}{self.Unit}")
+        self.Graph.setChart(self.CHART)
+        self.LINE.setPen(self.pen)
+        self.POINT.setColor(self.color)
+        self.POINT.setMarkerSize(8)
+
 
 class Controller:
     def __init__(self):
-        self.spline_alt, self.spline_temp, self.spline_vel, self.spline_hum, self.spline_altr, self.spline_tempr, self.spline_velr = (
-            QSplineSeries(), QSplineSeries(), QSplineSeries(), QSplineSeries(), QSplineSeries(), QSplineSeries(),
-            QSplineSeries())
-
-        self.point_alt, self.point_temp, self.point_vel, self.point_hum, self.point_altr, self.point_tempr, self.point_velr = (
-            QScatterSeries(), QScatterSeries(), QScatterSeries(), QScatterSeries(), QScatterSeries(), QScatterSeries(),
-            QScatterSeries())
-
-        self.chart_alt, self.chart_temp, self.chart_vel, self.chart_hum, self.chart_altr, self.chart_tempr, self.chart_velr = (
-            QChart(), QChart(), QChart(), QChart(), QChart(), QChart(), QChart())
-
-        self.axisX_alt, self.axisX_temp, self.axisX_vel, self.axisX_hum, self.axisX_altr, self.axisX_tempr, self.axisX_velr = (
-            QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis())
-
-        self.axisY_alt, self.axisY_temp, self.axisY_vel, self.axisY_hum, self.axisY_altr, self.axisY_tempr, self.axisY_velr = (
-            QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis())
+        self._send = False
+        self.state_alt = []
+        self.peak = -10000
+        self.state = "PRELAUNCH"
 
         self.show_splash()
 
@@ -239,8 +301,9 @@ class Controller:
 
     def start_clock(self):
         self.worker_time = ThreadTimer()
+        self.worker_elapsed = ThreadElaps()
         self.worker_time.time_carrier.connect(self.update_time)
-        self.worker_time.elapsed_carrier.connect(self.update_elapsed)
+        self.worker_elapsed.elapsed_carrier.connect(self.update_elapsed)
         self.worker_time.start()
 
     def start_serial(self, device):
@@ -251,7 +314,13 @@ class Controller:
         self.worker_serial.start()
 
     def start_mqtt(self):
-        self.mqtt = mqtt.Initialise_client()
+        try:
+            self.mqtt = mqtt.Initialise_client()
+            print("[MQTT_CONNECTED]")
+            self._send = True
+        except TimeoutError:
+            print("[MQTT_FAILED]")
+            self._send = False
 
     def update_time(self, time):
         self.ui_main.ui.Time.setText(time)
@@ -260,112 +329,19 @@ class Controller:
         self.ui_main.ui.Elapsed.setText(time)
 
     def set_graph(self):
-        self.color = QColor(217, 17, 194)
-        self.pen = QPen(self.color)
-        self.pen.setWidth(2)
+        self.C_ALT = Chart(self.ui_main.ui.C_alt_graph, "ALTITUDE", "(m)")
+        self.C_TEM = Chart(self.ui_main.ui.C_temp_graph, "TEMPERATURE", "(C)")
+        self.C_VEL = Chart(self.ui_main.ui.C_velo_graph, "VELOCITY", "(m/s)")
+        self.C_HUM = Chart(self.ui_main.ui.C_humid_graph, "HUMIDITY", "(m)")
+        self.R_ALT = Chart(self.ui_main.ui.R_alt_graph, "ALTITUDE", "(m)")
+        self.R_TEM = Chart(self.ui_main.ui.R_temp_graph, "TEMPERATURE", "(C)")
+        self.R_VEL = Chart(self.ui_main.ui.R_velo_graph, "VELOCITY", "(m/s)")
 
-        self.C_ALT = {"GRAPH": self.ui_main.ui.C_alt_graph,
-                      "LINE": self.spline_alt,
-                      "POINT": self.point_alt,
-                      "CHART": self.chart_alt,
-                      "X-AXIS": self.axisX_alt,
-                      "Y-AXIS": self.axisY_alt,
-                      "TITLE": f"Altitude {self.c['ALT']}M",
-                      "X": self.c["PKG"],
-                      "y": self.c["ALT"]}
-
-        self.C_TEMP = {"GRAPH": self.ui_main.ui.C_temp_graph,
-                       "LINE": self.spline_temp,
-                       "POINT": self.point_temp,
-                       "CHART": self.chart_temp,
-                       "X-AXIS": self.axisX_temp,
-                       "Y-AXIS": self.axisY_temp,
-                       "TITLE": f"Temperature {self.c['TEM']}C",
-                       "X": self.c["PKG"],
-                       "y": self.c["TEM"]}
-
-        self.C_VEL = {"GRAPH": self.ui_main.ui.C_velo_graph,
-                      "LINE": self.spline_vel,
-                      "POINT": self.point_vel,
-                      "CHART": self.chart_vel,
-                      "X-AXIS": self.axisX_vel,
-                      "Y-AXIS": self.axisY_vel,
-                      "TITLE": f'Velocity {self.to_vel(self.c["ACX"], self.c["ACY"], self.c["ACZ"])} m/s',
-                      "X": self.c["PKG"],
-                      "y": self.to_vel(self.c["ACX"], self.c["ACY"], self.c["ACZ"])}
-
-        self.C_HUM = {"GRAPH": self.ui_main.ui.C_humid_graph,
-                      "LINE": self.spline_hum,
-                      "POINT": self.point_hum,
-                      "CHART": self.chart_hum,
-                      "X-AXIS": self.axisX_hum,
-                      "Y-AXIS": self.axisY_hum,
-                      "TITLE": f"HUMIDITY {self.c['HUM']} %",
-                      "X": self.c["PKG"],
-                      "y": self.c["HUM"]}
-
-        self.R_ALT = {"GRAPH": self.ui_main.ui.R_alt_graph,
-                      "LINE": self.spline_altr,
-                      "POINT": self.point_altr,
-                      "CHART": self.chart_altr,
-                      "X-AXIS": self.axisX_altr,
-                      "Y-AXIS": self.axisY_altr,
-                      "TITLE": f"ALTITUDE {self.r['ALT']} M",
-                      "X": self.r["PKG"],
-                      "y": self.r["ALT"]}
-
-        self.R_TEMP = {"GRAPH": self.ui_main.ui.R_temp_graph,
-                       "LINE": self.spline_tempr,
-                       "POINT": self.point_tempr,
-                       "CHART": self.chart_tempr,
-                       "X-AXIS": self.axisX_tempr,
-                       "Y-AXIS": self.axisY_tempr,
-                       "TITLE": f"HUMIDITY {self.r['TEM']} %",
-                       "X": self.r["PKG"],
-                       "y": self.r["TEM"]}
-
-        self.R_VEL = {"GRAPH": self.ui_main.ui.R_velo_graph,
-                      "LINE": self.spline_velr,
-                      "POINT": self.point_velr,
-                      "CHART": self.chart_velr,
-                      "X-AXIS": self.axisX_velr,
-                      "Y-AXIS": self.axisY_velr,
-                      "TITLE": f'VELOCITY {self.to_vel(self.r["ACX"], self.r["ACY"], self.r["ACZ"])} %',
-                      "X": self.c["PKG"],
-                      "y": self.to_vel(self.r["ACX"], self.r["ACY"], self.r["ACZ"])}
-
-        self.GRAPH = [self.C_ALT, self.C_TEMP, self.C_VEL, self.C_HUM, self.R_ALT, self.R_TEMP, self.R_VEL]
-
-        for item in self.GRAPH:
-            item["GRAPH"].setRenderHint(QPainter.Antialiasing)
-            item["CHART"].legend().setVisible(False)
-            item["CHART"].setDropShadowEnabled(True)
-            item["CHART"].setAnimationOptions(QChart.SeriesAnimations)
-            item["CHART"].setTheme(QChart.ChartThemeBrownSand)
-            item["CHART"].createDefaultAxes()
-            item["X-AXIS"].setRange(0, 100)
-            item["Y-AXIS"].setRange(0, 100)
-            item["CHART"].setAxisX(item["X-AXIS"], item["LINE"])
-            item["CHART"].setAxisY(item["Y-AXIS"], item["LINE"])
-            item["CHART"].addSeries(item["LINE"])
-            item["CHART"].addSeries(item["POINT"])
-            item["CHART"].setTitle(item["TITLE"])
-            item["GRAPH"].setChart(item["CHART"])
-
-    def update_graph(self, item):
-        item["LINE"].append(item["X"], item["Y"])
-        item["POINT"].append(item["X"], item["Y"])
-        item["X-AXIS"].setRange(min(item["X"]), max(item["X"]))
-        item["Y-AXIS"].setRange(min(item["Y"]), max(item["Y"]))
-        item["CHART"].setAxisX(item["X-AXIS"], item["LINE"])
-        item["CHART"].setAxisY(item["Y-AXIS"], item["LINE"])
-        item["CHART"].addSeries(item["LINE"])
-        item["CHART"].addSeries(item["POINT"])
-        item["CHART"].setTitle(item["TITLE"])
-        item["GRAPH"].setChart(item["CHART"])
-        item["LINE"].setPen(self.pen)
-        item["POINT"].setColor(self.color)
-        item["POINT"].setMarkerSize(8)
+    def update_graph(self, graph, x, y):
+        try:
+            graph.plot(x, y)
+        except:
+            pass
 
     def update_cansat(self, data):
         self.c = data
@@ -373,44 +349,72 @@ class Controller:
         self.ui_main.ui.PM10.setText(f'{self.c["P10"]} ug/m3')
         self.ui_main.ui.PM25.setText(f'{self.c["P25"]} ug/m3')
         self.ui_main.ui.AQI.setText(f'{(self.c["P25"] + self.c["P10"]) / 2} ug/m3')
+        self.ui_main.ui.Drop.setText(f'{self.c["ACZ"]} m/s')
 
-        self.ui_main.ui.C_accx_bar.setValue(self.c["ACX"])
-        self.ui_main.ui.C_accy_bar.setValue(self.c["ACY"])
-        self.ui_main.ui.C_accz_bar.setValue(self.c["ACZ"])
+        self.ui_main.ui.C_accx_bar.setValue(int(round(self.c["ACX"])))
+        self.ui_main.ui.C_accy_bar.setValue(int(round(self.c["ACY"])))
+        self.ui_main.ui.C_accz_bar.setValue(int(round(self.c["ACZ"])))
 
-        self.ui_main.ui.C_gyrox_bar.setValue(self.c["GYX"])
-        self.ui_main.ui.C_gyroy_bar.setValue(self.c["GYY"])
-        self.ui_main.ui.C_gyroz_bar.setValue(self.c["GYZ"])
+        self.ui_main.ui.C_gyrox_bar.setValue(int(round(self.c["GYX"])))
+        self.ui_main.ui.C_gyroy_bar.setValue(int(round(self.c["GYY"])))
+        self.ui_main.ui.C_gyroz_bar.setValue(int(round(self.c["GYZ"])))
 
-        self.update_graph(self.C_ALT)
-        self.update_graph(self.C_TEMP)
-        self.update_graph(self.C_VEL)
-        self.update_graph(self.C_HUM)
-        mqtt.sendserver(self.mqtt, data)
+        self.update_graph(self.C_ALT, self.c["PKG"],self.c["ALT"])
+        self.update_graph(self.C_TEM, self.c["PKG"],self.c["TEM"])
+        self.update_graph(self.C_VEL, self.c["PKG"],self.to_vel(self.c["ACX"],self.c["ACY"],self.c["ACZ"]))
+        self.update_graph(self.C_HUM, self.c["PKG"],self.c["HUM"])
+
+        if self._send:
+            mqtt.sendserver(self.mqtt, data)
 
     def update_rocket(self, data):
         self.r = data
-        self.ui_main.ui.R_pkg.setText({self.r["PKG"]})
-        self.ui_main.ui.R_accx_bar.setValue(self.r["ACX"])
-        self.ui_main.ui.R_accy_bar.setValue(self.r["ACY"])
-        self.ui_main.ui.R_accz_bar.setValue(self.r["ACZ"])
-        self.ui_main.ui.R_gyrox_bar.setValue(self.r["GYX"])
-        self.ui_main.ui.R_gyroy_bar.setValue(self.r["GYY"])
-        self.ui_main.ui.R_gyroz_bar.setValue(self.r["GYZ"])
+        self.ui_main.ui.R_pkg.setText(str(self.r["PKG"]))
+        self.ui_main.ui.R_accx_bar.setValue(int(round(float(self.r["ACX"]))))
+        self.ui_main.ui.R_accy_bar.setValue(int(round(float(self.r["ACY"]))))
+        self.ui_main.ui.R_accz_bar.setValue(int(round(float(self.r["ACZ"]))))
+
+        self.ui_main.ui.R_gyrox_bar.setValue(int(round(float(self.r["GYX"]))))
+        self.ui_main.ui.R_gyroy_bar.setValue(int(round(float(self.r["GYY"]))))
+        self.ui_main.ui.R_gyroz_bar.setValue(int(round(float(self.r["GYZ"]))))
 
         self.update_graph(self.R_ALT)
-        self.update_graph(self.R_TEMP)
+        self.update_graph(self.R_TEM)
         self.update_graph(self.R_VEL)
-        mqtt.sendserver(self.mqtt, data)
+        if self._send:
+            mqtt.sendserver(self.mqtt, data)
+
+    def update_state(self):
+        self.state_alt.append(float(self.r["ALT"]))
+        if float(self.r["ALT"]) > self.peak:
+            self.peak = float(self.r["ALT"])
+        if len(self.state_alt) < 10:
+            self.state = 'PRELAUNCH'
+            self.ground = self.state_alt[0]
+            self.ui_main.ui.State_bar.setMinimumSize(int(round(self.ground)))
+            self.ui_main.ui.State_bar.setMaximum(500)
+        elif self.state == "PRELAUNCH" and self.state_alt[-1] - self.ground > 10:
+            self.state = "LAUNCHED"
+        elif self.state == "LAUNCHED" and self.peak - self.state_alt[-1] > 10:
+            self.state = "APOGEE"
+            self.ui_main.ui.State_bar.setMaximumSize(self.peak * 2)
+        elif self.state == "APOGEE" and self.peak - self.state_alt > 30:
+            self.state = "DESCEND"
+        elif self.state == "DESCEND" and self.state_alt[-1] - self.ground < 10:
+            self.state = "LANDED"
+
+        self.ui_main.ui.State_bar.setValue((self.peak * 2) - self.state_alt[-1])
+        self.ui_main.ui.state_t.setText(self.state)
 
     def update_ground(self, data):
         self.g = data
         self.GNSS = Coord(self.g["LAT"], self.g["LNG"], self.c["LAT"], self.c["LNG"], self.g["ALT"], self.c["ALT"],
                           self.g["MGX"], self.g["MGY"], self.g["MGZ"])
-        self.ui_main.ui.Azimuth.setText(self.GNSS.azimuth())
-        self.ui_main.ui.Elevation.setText(self.GNSS.elevation())
-        self.ui_main.ui.GD.setText(self.GNSS.ground_distance())
-        self.ui_main.ui.Sight.setText(self.GNSS.line_of_sight())
+        self.ui_main.ui.Azimuth.setText(str(self.GNSS.azimuth()))
+        self.ui_main.ui.Elevation.setText(str(self.GNSS.elevation()))
+        self.ui_main.ui.GD.setText(str(self.GNSS.ground_distance()))
+        self.ui_main.ui.Sight.setText(str(self.GNSS.line_of_sight()))
+        self.ui_main.ui.Heading.setText(str(self.GNSS.heading()))
 
     @staticmethod
     def to_vel(a, b, c):

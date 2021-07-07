@@ -1,3 +1,3 @@
-x,y,z,i = (2,2,2,2)
+a = [1,2,3,4,5,6]
 
-print(x,y,z,i)
+print(min(a))

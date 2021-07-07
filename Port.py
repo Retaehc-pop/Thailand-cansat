@@ -35,8 +35,8 @@ class Port:
         while telemetry != self.end:
             pkg += telemetry
             telemetry = self.device.read().decode('utf-8')
-        pkg.replace('\r', '')
-        pkg.replace('\n', '')
+        pkg = pkg.replace('\r', '')
+        pkg = pkg.replace('\n', '')
         return pkg
 
     def path(self):
@@ -58,30 +58,36 @@ class Port:
     #         pass
 
     def reading(self):
-        try:
-            recieved = self.read()
-            if recieved != "":
-                Data = recieved.split(",")
-                if Data[0] == "R":
-                    telemetry = {"TYP": Data[0],"PKG": Data[1],"ALT": Data[2],
-                                 "LAT": Data[3],"LNG": Data[4],"TEM": Data[5],
-                                 "BAT": Data[6],"ACX": Data[7],"ACY": Data[8],
-                                 "ACZ": Data[9],"GYX": Data[10],"GYY": Data[11],"GYZ": Data[12]}
-                elif Data[0] == "C":
-                    telemetry = {"TYP": Data[0],"PKG": Data[1],"ALT": Data[2],
-                                 "LAT": Data[3],"LNG": Data[4],"GAL": Data[5],
-                                 "TEM": Data[6],"HUM": Data[7],"PRE": Data[8],
-                                 "BAT": Data[9],"P10": Data[10],"P25": Data[11],
-                                 "ACX": Data[12],"ACY": Data[13],"ACZ": Data[14],
-                                 "GYX": Data[15],"GYY": Data[16],"GYZ": Data[17]}
-                elif Data[0] == "G":
-                    telemetry = {"TYP" : Data[0],"LAT": Data[1],"LNG": Data[2], "ALT": Data[3],
-                                 "MGX": Data[4],"MGY": Data[5],"MGZ": Data[6]}
-                with open(self.path, "a") as file:
-                    file.write(recieved)
-                return telemetry
-        except:
-            pass
+        while True:
+            try:
+                recieved = self.read()
+                print(f"re:{recieved}")
+                if recieved != "":
+                    Data = recieved.split(",")
+                    print(Data)
+                    if Data[0] == "R":
+                        telemetry = {"TYP": str(Data[0]), "PKG": int(Data[1]), "ALT": float(Data[2]),
+                                     "LAT": float(Data[3]), "LNG": float(Data[4]), "TEM": float([5]),
+                                     "BAT": float(Data[6]), "ACX": float(Data[7]), "ACY": float(Data[8]),
+                                     "ACZ": float(Data[9]), "GYX": float(Data[10]), "GYY": float(Data[11]),
+                                     "GYZ": float(Data[12])}
+                    elif Data[0] == "C":
+                        telemetry = {"TYP": str(Data[0]), "PKG": int(Data[1]), "ALT": float(Data[2]),
+                                     "LAT": float(Data[3]), "LNG": float(Data[4]), "GAL": float(Data[5]),
+                                     "TEM": float(Data[6]), "HUM": float(Data[7]), "PRE": float(Data[8]),
+                                     "BAT": float(Data[9]), "P10": float(Data[10]), "P25": float(Data[11]),
+                                     "ACX": float(Data[12]), "ACY": float(Data[13]), "ACZ": float(Data[14]),
+                                     "GYX": float(Data[15]), "GYY": float(Data[16]), "GYZ": float(Data[17])}
+                    elif Data[0] == "G":
+                        telemetry = {"TYP": str(Data[0]), "LAT": float(Data[1]), "LNG": float(Data[2]),
+                                     "ALT": float(Data[3]),"MGX": float(Data[4]), "MGY": float(Data[5]),
+                                     "MGZ": float(Data[6])}
+                    with open(self.path, "a") as file:
+                        file.write(recieved)
+                    print(telemetry)
+                    return telemetry
+            except:
+                pass
 
 
 if __name__ == "__main__":
