@@ -22,8 +22,9 @@ class MainWindow(QMainWindow):
         self.ui = UI_MainWindow()
         self.ui.setupUi(self)
         self.connect_btn()
+        self.refresh()
 
-        def move_window(event):
+        def move_window(self, event):
             if UiFunctions.return_status(self) == 1:
                 UiFunctions.maximize_restore(self)
 
@@ -42,7 +43,7 @@ class MainWindow(QMainWindow):
     def connect_btn(self):
         self.ui.btn_connect.clicked.connect(self.online)
         self.ui.btn_refresh.clicked.connect(self.refresh)
-        self.ui.btn_clear.clicked.connect(self.clear)
+        self.ui.btn_clear.clicked.connect(self.clear())
         self.ui.btn_c_on.clicked.connect(lambda: self.cmd('C_ON'))
         self.ui.btn_c_off.clicked.connect(lambda: self.cmd('C_OF'))
         self.ui.btn_r_on.clicked.connect(lambda: self.cmd('R_ON'))
@@ -54,7 +55,10 @@ class MainWindow(QMainWindow):
             self.ui.portlist.addItem(com)
 
     def clear(self):
-        pass
+        try:
+            Window.clear()
+        except:
+            pass
 
     def online(self):
         port = self.ui.portlist.currentText()
@@ -119,7 +123,6 @@ class ThreadMain(QThread):
         super(ThreadMain, self).__init__(parent)
         self.device = device
         self.port = Port.Port(device=self.device)
-        # self.startread.connect_port(9600)
 
     def __del__(self):
         self.wait()
@@ -129,17 +132,17 @@ class ThreadMain(QThread):
         while True:
             self.pkg = self.port.reading()
             print(f"[THREAD_IN] : {self.pkg}")
-            if self.pkg[0] == 'C':
+            if self.pkg["TYP"] == 'C':
                 print('[CANSAT]', end="")
-                self.pkg1 = self.pkg[:]
+                self.pkg1 = self.pkg
                 self.carrier1.emit(self.pkg1)
-            elif self.pkg[0] == 'R':
+            elif self.pkg["TYP"] == 'R':
                 print('[ROCKET]', end="")
-                self.pkg2 = self.pkg[:]
+                self.pkg2 = self.pkg
                 self.carrier2.emit(self.pkg2)
-            elif self.pkg[0] == 'G':
+            elif self.pkg["TYP"] == 'G':
                 print('[GROUND]', end="")
-                self.pkg3 = self.pkg[:]
+                self.pkg3 = self.pkg
                 self.carrier3.emit(self.pkg3)
 
     def stop(self):
@@ -173,18 +176,39 @@ class Controller:
         self.spline_alt, self.spline_temp, self.spline_vel, self.spline_hum, self.spline_altr, self.spline_tempr, self.spline_velr = (
             QSplineSeries(), QSplineSeries(), QSplineSeries(), QSplineSeries(), QSplineSeries(), QSplineSeries(),
             QSplineSeries())
+
         self.point_alt, self.point_temp, self.point_vel, self.point_hum, self.point_altr, self.point_tempr, self.point_velr = (
             QScatterSeries(), QScatterSeries(), QScatterSeries(), QScatterSeries(), QScatterSeries(), QScatterSeries(),
             QScatterSeries())
+
         self.chart_alt, self.chart_temp, self.chart_vel, self.chart_hum, self.chart_altr, self.chart_tempr, self.chart_velr = (
             QChart(), QChart(), QChart(), QChart(), QChart(), QChart(), QChart())
+
         self.axisX_alt, self.axisX_temp, self.axisX_vel, self.axisX_hum, self.axisX_altr, self.axisX_tempr, self.axisX_velr = (
             QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis())
+
         self.axisY_alt, self.axisY_temp, self.axisY_vel, self.axisY_hum, self.axisY_altr, self.axisY_tempr, self.axisY_velr = (
             QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis(), QValueAxis())
 
         self.show_splash()
-        self.setup()
+
+    def clear(self):
+        self.ui_main.ui.Sight.setText("0")
+        self.ui_main.ui.Azimuth.setText("0")
+        self.ui_main.ui.Elevation.setText("0")
+        self.ui_main.ui.GD.setText("0")
+        self.ui_main.ui.Heading.setText("0")
+        self.ui_main.ui.PM10.setText("0")
+        self.ui_main.ui.PM25.setText("0")
+        self.ui_main.ui.AQI.setText("0")
+        self.ui_main.ui.C_pkg.setText("0")
+        self.ui_main.ui.R_pkg.setText("0")
+        self.ui_main.ui.Drop.setText("0")
+        self.ui_main.ui.apogee.setText("0")
+        self.ui_main.ui.C_latitude.setText("0")
+        self.ui_main.ui.C_longitude.setText("0")
+        self.ui_main.ui.R_latitude.setText("0")
+        self.ui_main.ui.R_longitude.setText("0")
 
     def setup(self):
         self.c = {"PKG": 0, "ALT": 0, "LAT": 0,
@@ -208,7 +232,9 @@ class Controller:
     def show_ui(self):
         self.window_ui = QtWidgets.QMainWindow()
         self.ui_main = MainWindow()
+        self.setup()
         self.set_graph()
+        self.clear()
         print('[MAINWINDOW]', end="")
 
     def start_clock(self):
@@ -222,8 +248,10 @@ class Controller:
         self.worker_serial.carrier1.connect(self.update_cansat)
         self.worker_serial.carrier2.connect(self.update_rocket)
         self.worker_serial.carrier3.connect(self.update_ground)
-        self.mqtt = mqtt.Initialise_client()
         self.worker_serial.start()
+
+    def start_mqtt(self):
+        self.mqtt = mqtt.Initialise_client()
 
     def update_time(self, time):
         self.ui_main.ui.Time.setText(time)
@@ -340,54 +368,7 @@ class Controller:
         item["POINT"].setMarkerSize(8)
 
     def update_cansat(self, data):
-        self.c["PKG"] = int(data[1])
-        self.c["ALT"] = float(data[2])
-        self.c["LAT"] = float(data[3])
-        self.c["LNG"] = float(data[4])
-        self.c["TEM"] = float(data[5])
-        self.c["HUM"] = float(data[6])
-        self.c["PRE"] = float(data[7])
-        self.c["BAT"] = float(data[8])
-        self.c["P10"] = float(data[9])
-        self.c["P25"] = float(data[10])
-        self.c["ACX"] = float(data[11])
-        self.c["ACY"] = float(data[12])
-        self.c["ACZ"] = float(data[13])
-        self.c["GYX"] = float(data[14])
-        self.c["GYY"] = float(data[15])
-        self.c["GYZ"] = float(data[16])
-        self.thread_c = threading.Thread(target=self.update_c)
-        self.thread_c.start()
-        mqtt.sendserver(self.mqtt,data)
-
-    def update_rocket(self, data):
-        self.r["PKG"] = int(data[1])
-        self.r["ALT"] = float(data[2])
-        self.r["LAT"] = float(data[3])
-        self.r["LNG"] = float(data[4])
-        self.r["TEM"] = float(data[5])
-        self.r["BAT"] = float(data[6])
-        self.r["ACX"] = float(data[7])
-        self.r["ACY"] = float(data[8])
-        self.r["ACZ"] = float(data[9])
-        self.r["GYX"] = float(data[10])
-        self.r["GYY"] = float(data[11])
-        self.r["GYZ"] = float(data[12])
-        self.thread_r = threading.Thread(target=self.update_r)
-        self.thread_r.start()
-        mqtt.sendserver(self.mqtt, data)
-
-    def update_ground(self, data):
-        self.g["LAT"] = float(data[1])
-        self.g["LNG"] = float(data[2])
-        self.g["ALT"] = float(data[3])
-        self.g["MGX"] = float(data[4])
-        self.g["MGY"] = float(data[4])
-        self.g["MGZ"] = float(data[4])
-        self.thread_g = threading.Thread(target=self.update_g)
-        self.thread_g.start()
-
-    def update_c(self):
+        self.c = data
         self.ui_main.ui.C_pkg.setText(str(self.c["PKG"]))
         self.ui_main.ui.PM10.setText(f'{self.c["P10"]} ug/m3')
         self.ui_main.ui.PM25.setText(f'{self.c["P25"]} ug/m3')
@@ -405,14 +386,14 @@ class Controller:
         self.update_graph(self.C_TEMP)
         self.update_graph(self.C_VEL)
         self.update_graph(self.C_HUM)
+        mqtt.sendserver(self.mqtt, data)
 
-    def update_r(self):
+    def update_rocket(self, data):
+        self.r = data
         self.ui_main.ui.R_pkg.setText({self.r["PKG"]})
-
         self.ui_main.ui.R_accx_bar.setValue(self.r["ACX"])
         self.ui_main.ui.R_accy_bar.setValue(self.r["ACY"])
         self.ui_main.ui.R_accz_bar.setValue(self.r["ACZ"])
-
         self.ui_main.ui.R_gyrox_bar.setValue(self.r["GYX"])
         self.ui_main.ui.R_gyroy_bar.setValue(self.r["GYY"])
         self.ui_main.ui.R_gyroz_bar.setValue(self.r["GYZ"])
@@ -420,8 +401,10 @@ class Controller:
         self.update_graph(self.R_ALT)
         self.update_graph(self.R_TEMP)
         self.update_graph(self.R_VEL)
+        mqtt.sendserver(self.mqtt, data)
 
-    def update_g(self):
+    def update_ground(self, data):
+        self.g = data
         self.GNSS = Coord(self.g["LAT"], self.g["LNG"], self.c["LAT"], self.c["LNG"], self.g["ALT"], self.c["ALT"],
                           self.g["MGX"], self.g["MGY"], self.g["MGZ"])
         self.ui_main.ui.Azimuth.setText(self.GNSS.azimuth())
@@ -436,6 +419,6 @@ class Controller:
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    app = QApplication()
     Window = Controller()
     sys.exit(app.exec())
