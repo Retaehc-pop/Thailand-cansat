@@ -3,9 +3,11 @@ import serial
 import math
 import RTC
 import mqtt
+import time
 from ui_main import Ui_GrounStation as UI_MainWindow
 from UI_splashscreen import Ui_MainWindow as UI_splashscreen
 from UI_Function import *
+from compasswidget import CompassWidget
 import sys
 import threading
 from PySide6.QtCharts import *
@@ -43,7 +45,7 @@ class MainWindow(QMainWindow):
     def connect_btn(self):
         self.ui.btn_connect.clicked.connect(self.online)
         self.ui.btn_refresh.clicked.connect(self.refresh)
-        self.ui.pushButton.clicked.connect(Window.start_mqtt)
+        self.ui.btn_mqtt.clicked.connect(Window.start_mqtt)
         self.ui.btn_clear.clicked.connect(self.clear())
         self.ui.btn_c_on.clicked.connect(lambda: self.cmd('C_ON'))
         self.ui.btn_c_off.clicked.connect(lambda: self.cmd('C_OF'))
@@ -152,6 +154,8 @@ class ThreadMain(QThread):
 
 class ThreadTimer(QThread):
     time_carrier = QtCore.Signal(object)
+    elapsed_carrier = QtCore.Signal(object)
+
     def __init__(self, parent=None):
         self._isRunning = True
         super(ThreadTimer, self).__init__(parent)
@@ -169,34 +173,22 @@ class ThreadTimer(QThread):
         self._isRunning = False
         self.terminate()
 
-class ThreadElaps(QThread):
-    elapsed_carrier = QtCore.Signal(object)
-
-    def __init__(self, parent=None):
-        self._isRunning = True
-        super(ThreadElaps, self).__init__(parent)
-
-    def __del__(self):
-        self.wait()
-
-    def run(self):
-        clock = RTC.GetTime()
-        while True:
-            self.elapsed_carrier.emit(clock.time_elapsed())
-
-    def stop(self):
-        self._isRunning = False
-        self.terminate()
 
 
 class Chart:
-    def __init__(self, Graph: QChartView, Title: str, unit: str):
+    def __init__(self, Graph: QChartView, Title: str, unit: str, howmany=1, ):
         self.color = QColor(217, 17, 194)
         self.pen = QPen(self.color)
         self.pen.setWidth(2)
+        self.howmany = howmany
 
-        self.LINE = QSplineSeries()
-        self.POINT = QScatterSeries()
+        self.LINE = []
+        self.POINT = []
+        for i in range(howmany):
+            self.LINE.append(QSplineSeries())
+            self.POINT.append(QScatterSeries())
+        # self.LINE = QSplineSeries()
+        # self.POINT = QScatterSeries()
         self.CHART = QChart()
         self.X_AXIS = QValueAxis()
         self.Y_AXIS = QValueAxis()
@@ -206,7 +198,9 @@ class Chart:
         self.Unit = unit
         self.x = []
         self.y = []
+        self.setup()
 
+    def setup(self):
         self.Graph.setRenderHint(QPainter.Antialiasing)
         self.CHART.legend().setVisible(False)
         self.CHART.setDropShadowEnabled(True)
@@ -215,34 +209,36 @@ class Chart:
         self.CHART.createDefaultAxes()
         self.X_AXIS.setRange(0, 100)
         self.Y_AXIS.setRange(0, 100)
-        self.CHART.setAxisX(self.X_AXIS, self.LINE)
-        self.CHART.setAxisY(self.Y_AXIS, self.LINE)
-        self.CHART.addSeries(self.LINE)
-        self.CHART.addSeries(self.POINT)
+        for i in range(self.howmany):
+            self.CHART.setAxisX(self.X_AXIS, self.LINE[i])
+            self.CHART.setAxisY(self.Y_AXIS, self.LINE[i])
+            self.CHART.addSeries(self.LINE[i])
+            self.CHART.addSeries(self.POINT[i])
         self.CHART.setTitle(f"{self.Title} 0 {self.Unit}")
         self.Graph.setChart(self.CHART)
 
     def clear(self):
-        self.LINE.clear()
-        self.POINT.clear()
+        for i in range(self.howmany):
+            self.LINE[i].clear()
+            self.POINT[i].clear()
 
-    def plot(self, x, y):
+    def plot(self, x, y, index=0):
         self.x.append(x)
         self.y.append(y)
 
-        self.LINE.append(x, y)
-        self.POINT.append(x, y)
+        self.LINE[index].append(x, y)
+        self.POINT[index].append(x, y)
         self.X_AXIS.setRange(min(self.x), max(self.x))
         self.Y_AXIS.setRange(min(self.y), max(self.y))
-        self.CHART.setAxisX(self.X_AXIS, self.LINE)
-        self.CHART.setAxisY(self.Y_AXIS, self.LINE)
-        self.CHART.addSeries(self.LINE)
-        self.CHART.addSeries(self.POINT)
+        self.CHART.setAxisX(self.X_AXIS, self.LINE[index])
+        self.CHART.setAxisY(self.Y_AXIS, self.LINE[index])
+        self.CHART.addSeries(self.LINE[index])
+        self.CHART.addSeries(self.POINT[index])
         self.CHART.setTitle(f"{self.Title}{x}{self.Unit}")
         self.Graph.setChart(self.CHART)
-        self.LINE.setPen(self.pen)
-        self.POINT.setColor(self.color)
-        self.POINT.setMarkerSize(8)
+        self.LINE[index].setPen(self.pen)
+        self.POINT[index].setColor(self.color)
+        self.POINT[index].setMarkerSize(8)
 
 
 class Controller:
@@ -300,10 +296,13 @@ class Controller:
         print('[MAINWINDOW]', end="")
 
     def start_clock(self):
+        # x = threading.Thread(target=self.update_time)
+        # y = threading.Thread(target=self.update_elapsed)
+        # x.start()
+        # y.start()
         self.worker_time = ThreadTimer()
-        self.worker_elapsed = ThreadElaps()
         self.worker_time.time_carrier.connect(self.update_time)
-        self.worker_elapsed.elapsed_carrier.connect(self.update_elapsed)
+        self.worker_time.elapsed_carrier.connect(self.update_elapsed)
         self.worker_time.start()
 
     def start_serial(self, device):
@@ -322,26 +321,35 @@ class Controller:
             print("[MQTT_FAILED]")
             self._send = False
 
-    def update_time(self, time):
-        self.ui_main.ui.Time.setText(time)
+    def update_time(self, data):
+        # while True:
+        #     self.clock = RTC.GetTime()
+        #     self.ui_main.ui.Time.setText(self.clock.time_pc())
+        #     time.sleep(0.1)
+        self.ui_main.ui.Time.setText(data)
 
-    def update_elapsed(self, time):
-        self.ui_main.ui.Elapsed.setText(time)
+    def update_elapsed(self, data):
+        # while True:
+        #     self.ui_main.ui.Elapsed.setText(self.clock.time_elapsed())
+        #     time.sleep(0.1)
+        self.ui_main.ui.Elapsed.setText(data)
 
     def set_graph(self):
         self.C_ALT = Chart(self.ui_main.ui.C_alt_graph, "ALTITUDE", "(m)")
         self.C_TEM = Chart(self.ui_main.ui.C_temp_graph, "TEMPERATURE", "(C)")
         self.C_VEL = Chart(self.ui_main.ui.C_velo_graph, "VELOCITY", "(m/s)")
         self.C_HUM = Chart(self.ui_main.ui.C_humid_graph, "HUMIDITY", "(m)")
+        self.C_ACC = Chart(self.ui_main.ui.C_acc_graph, "Acceleration", "(m/s2)", 3)
+        self.C_GYR = Chart(self.ui_main.ui.C_gyro_graph, "Gyroscope", "(deg)", 3)
+
         self.R_ALT = Chart(self.ui_main.ui.R_alt_graph, "ALTITUDE", "(m)")
         self.R_TEM = Chart(self.ui_main.ui.R_temp_graph, "TEMPERATURE", "(C)")
         self.R_VEL = Chart(self.ui_main.ui.R_velo_graph, "VELOCITY", "(m/s)")
+        self.R_ACC = Chart(self.ui_main.ui.R_acc_graph, "Acceleration", "(m/s2)", 3)
+        self.R_GYR = Chart(self.ui_main.ui.R_gyro_graph, "Gyroscope", "(deg)", 3)
 
-    def update_graph(self, graph, x, y):
-        try:
-            graph.plot(x, y)
-        except:
-            pass
+    def update_graph(self, graph, x, y, index=0):
+        graph.plot(x, y, index)
 
     def update_cansat(self, data):
         self.c = data
@@ -351,38 +359,47 @@ class Controller:
         self.ui_main.ui.AQI.setText(f'{(self.c["P25"] + self.c["P10"]) / 2} ug/m3')
         self.ui_main.ui.Drop.setText(f'{self.c["ACZ"]} m/s')
 
-        self.ui_main.ui.C_accx_bar.setValue(int(round(self.c["ACX"])))
-        self.ui_main.ui.C_accy_bar.setValue(int(round(self.c["ACY"])))
-        self.ui_main.ui.C_accz_bar.setValue(int(round(self.c["ACZ"])))
+        a = threading.Thread(target=lambda: self.update_graph(self.C_ACC, self.c["PKG"], self.c["ALT"], 0))
+        b = threading.Thread(target=lambda: self.update_graph(self.C_ACC, self.c["PKG"], self.c["ALT"], 1))
+        c = threading.Thread(target=lambda: self.update_graph(self.C_ACC, self.c["PKG"], self.c["ALT"], 2))
 
-        self.ui_main.ui.C_gyrox_bar.setValue(int(round(self.c["GYX"])))
-        self.ui_main.ui.C_gyroy_bar.setValue(int(round(self.c["GYY"])))
-        self.ui_main.ui.C_gyroz_bar.setValue(int(round(self.c["GYZ"])))
+        d = threading.Thread(target=lambda: self.update_graph(self.C_GYR, self.c["PKG"], self.c["ALT"], 0))
+        e = threading.Thread(target=lambda: self.update_graph(self.C_GYR, self.c["PKG"], self.c["ALT"], 1))
+        f = threading.Thread(target=lambda: self.update_graph(self.C_GYR, self.c["PKG"], self.c["ALT"], 2))
 
-        self.update_graph(self.C_ALT, self.c["PKG"],self.c["ALT"])
-        self.update_graph(self.C_TEM, self.c["PKG"],self.c["TEM"])
-        self.update_graph(self.C_VEL, self.c["PKG"],self.to_vel(self.c["ACX"],self.c["ACY"],self.c["ACZ"]))
-        self.update_graph(self.C_HUM, self.c["PKG"],self.c["HUM"])
-
+        w = threading.Thread(target=lambda: self.update_graph(self.C_ALT, self.c["PKG"], self.c["ALT"]))
+        x = threading.Thread(target=lambda: self.update_graph(self.C_TEM, self.c["PKG"], self.c["TEM"]))
+        y = threading.Thread(target=lambda: self.update_graph(self.C_VEL, self.c["PKG"],
+                                                              self.to_vel(self.c["ACX"], self.c["ACY"], self.c["ACZ"])))
+        z = threading.Thread(target=lambda: self.update_graph(self.C_HUM, self.c["PKG"], self.c["HUM"]))
+        w.start()
+        x.start()
+        y.start()
+        z.start()
         if self._send:
-            mqtt.sendserver(self.mqtt, data)
+            mqttc = threading.Thread(target=lambda: mqtt.sendserver(self.mqtt, data))
+            mqttc.start()
 
     def update_rocket(self, data):
         self.r = data
         self.ui_main.ui.R_pkg.setText(str(self.r["PKG"]))
-        self.ui_main.ui.R_accx_bar.setValue(int(round(float(self.r["ACX"]))))
-        self.ui_main.ui.R_accy_bar.setValue(int(round(float(self.r["ACY"]))))
-        self.ui_main.ui.R_accz_bar.setValue(int(round(float(self.r["ACZ"]))))
+        a = threading.Thread(target=lambda: self.update_graph(self.R_ACC, self.r["PKG"], self.r["ALT"], 0))
+        b = threading.Thread(target=lambda: self.update_graph(self.R_ACC, self.r["PKG"], self.r["ALT"], 1))
+        c = threading.Thread(target=lambda: self.update_graph(self.R_ACC, self.r["PKG"], self.r["ALT"], 2))
+        d = threading.Thread(target=lambda: self.update_graph(self.R_GYR, self.r["PKG"], self.r["ALT"], 0))
+        e = threading.Thread(target=lambda: self.update_graph(self.R_GYR, self.r["PKG"], self.r["ALT"], 1))
+        f = threading.Thread(target=lambda: self.update_graph(self.R_GYR, self.r["PKG"], self.r["ALT"], 2))
 
-        self.ui_main.ui.R_gyrox_bar.setValue(int(round(float(self.r["GYX"]))))
-        self.ui_main.ui.R_gyroy_bar.setValue(int(round(float(self.r["GYY"]))))
-        self.ui_main.ui.R_gyroz_bar.setValue(int(round(float(self.r["GYZ"]))))
-
-        self.update_graph(self.R_ALT)
-        self.update_graph(self.R_TEM)
-        self.update_graph(self.R_VEL)
+        x = threading.Thread(target=lambda: self.update_graph(self.R_ALT, self.r["PKG"], self.r["ALT"]))
+        y = threading.Thread(target=lambda: self.update_graph(self.R_TEM, self.r["PKG"], self.r["TEM"]))
+        z = threading.Thread(target=lambda: self.update_graph(self.R_VEL, self.r["PKG"],
+                                                              self.to_vel(self.r["ACX"], self.r["ACY"], self.r["ACZ"])))
+        x.start()
+        y.start()
+        z.start()
         if self._send:
-            mqtt.sendserver(self.mqtt, data)
+            mqttc = threading.Thread(target=lambda: mqtt.sendserver(self.mqtt, data))
+            mqttc.start()
 
     def update_state(self):
         self.state_alt.append(float(self.r["ALT"]))
@@ -398,7 +415,7 @@ class Controller:
         elif self.state == "LAUNCHED" and self.peak - self.state_alt[-1] > 10:
             self.state = "APOGEE"
             self.ui_main.ui.State_bar.setMaximumSize(self.peak * 2)
-        elif self.state == "APOGEE" and self.peak - self.state_alt > 30:
+        elif self.state == "APOGEE" and self.peak - self.state_alt[-1] > 30:
             self.state = "DESCEND"
         elif self.state == "DESCEND" and self.state_alt[-1] - self.ground < 10:
             self.state = "LANDED"
