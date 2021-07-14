@@ -174,21 +174,22 @@ class ThreadTimer(QThread):
         self.terminate()
 
 
-
 class Chart:
     def __init__(self, Graph: QChartView, Title: str, unit: str, howmany=1, ):
-        self.color = QColor(217, 17, 194)
-        self.pen = QPen(self.color)
-        self.pen.setWidth(2)
-        self.howmany = howmany
+        self.color = [QColor(255, 0, 0),QColor(0, 255, 0),QColor(0, 0, 255)]
+        self.pen = [QPen(self.color[0]),QPen(self.color[1]),QPen(self.color[2])]
 
+        self.howmany = howmany
         self.LINE = []
         self.POINT = []
+        self.x = []
+        self.y = []
         for i in range(howmany):
             self.LINE.append(QSplineSeries())
             self.POINT.append(QScatterSeries())
-        # self.LINE = QSplineSeries()
-        # self.POINT = QScatterSeries()
+            self.x.append([])
+            self.y.append([])
+            self.pen[i].setWidth(2)
         self.CHART = QChart()
         self.X_AXIS = QValueAxis()
         self.Y_AXIS = QValueAxis()
@@ -196,8 +197,7 @@ class Chart:
 
         self.Title = Title
         self.Unit = unit
-        self.x = []
-        self.y = []
+
         self.setup()
 
     def setup(self):
@@ -222,32 +222,49 @@ class Chart:
             self.LINE[i].clear()
             self.POINT[i].clear()
 
-    def plot(self, x, y, index=0):
-        self.x.append(x)
-        self.y.append(y)
+    # def plot(self, x, y, index=0):
+    #     self.x.append(x)
+    #     self.y.append(y)
+    #     self.LINE[index].append(x, y)
+    #     self.POINT[index].append(x, y)
+    #     self.X_AXIS.setRange(min(self.x), max(self.x))
+    #     self.Y_AXIS.setRange(min(self.y), max(self.y))
+    #     self.CHART.setAxisX(self.X_AXIS, self.LINE[index])
+    #     self.CHART.setAxisY(self.Y_AXIS, self.LINE[index])
+    #     self.CHART.addSeries(self.LINE[index])
+    #     self.CHART.addSeries(self.POINT[index])
+    #     self.CHART.setTitle(f"{self.Title}{y}{self.Unit}")
+    #     self.Graph.setChart(self.CHART)
+    #     self.LINE[index].setPen(self.pen)
+    #     self.POINT[index].setColor(self.color)
+    #     self.POINT[index].setMarkerSize(8)
 
-        self.LINE[index].append(x, y)
-        self.POINT[index].append(x, y)
-        self.X_AXIS.setRange(min(self.x), max(self.x))
-        self.Y_AXIS.setRange(min(self.y), max(self.y))
-        self.CHART.setAxisX(self.X_AXIS, self.LINE[index])
-        self.CHART.setAxisY(self.Y_AXIS, self.LINE[index])
-        self.CHART.addSeries(self.LINE[index])
-        self.CHART.addSeries(self.POINT[index])
-        self.CHART.setTitle(f"{self.Title}{x}{self.Unit}")
-        self.Graph.setChart(self.CHART)
-        self.LINE[index].setPen(self.pen)
-        self.POINT[index].setColor(self.color)
-        self.POINT[index].setMarkerSize(8)
-
+    def plot(self, plot: list):
+        if len(plot) != self.howmany:
+            raise ValueError
+        else:
+            for index, p in enumerate(plot):
+                self.x[index].append(p[0])
+                self.y[index].append(p[1])
+                self.LINE[index].append(p[0], p[1])
+                self.POINT[index].append(p[0], p[1])
+                self.X_AXIS.setRange(min(min(self.x)), max(max(self.x)))
+                self.Y_AXIS.setRange(min(min(self.y)), max(max(self.y)))
+                self.CHART.setAxisX(self.X_AXIS, self.LINE[index])
+                self.CHART.setAxisY(self.Y_AXIS, self.LINE[index])
+                self.CHART.addSeries(self.LINE[index])
+                self.CHART.addSeries(self.POINT[index])
+                self.CHART.setTitle(f"{self.Title}{p[1]}{self.Unit}")
+                self.Graph.setChart(self.CHART)
+                self.LINE[index].setPen(self.pen[index])
+                self.POINT[index].setColor(self.color[index])
+                self.POINT[index].setMarkerSize(8)
 
 class Controller:
     def __init__(self):
         self._send = False
         self.state_alt = []
-        self.peak = -10000
-        self.state = "PRELAUNCH"
-
+        self.alet = []
         self.show_splash()
 
     def clear(self):
@@ -348,8 +365,11 @@ class Controller:
         self.R_ACC = Chart(self.ui_main.ui.R_acc_graph, "Acceleration", "(m/s2)", 3)
         self.R_GYR = Chart(self.ui_main.ui.R_gyro_graph, "Gyroscope", "(deg)", 3)
 
-    def update_graph(self, graph, x, y, index=0):
-        graph.plot(x, y, index)
+    def update_graph(self, graph, plot:list):
+        try:
+            graph.plot(plot)
+        except ValueError:
+            print("wrong array size")
 
     def update_cansat(self, data):
         self.c = data
@@ -359,19 +379,18 @@ class Controller:
         self.ui_main.ui.AQI.setText(f'{(self.c["P25"] + self.c["P10"]) / 2} ug/m3')
         self.ui_main.ui.Drop.setText(f'{self.c["ACZ"]} m/s')
 
-        a = threading.Thread(target=lambda: self.update_graph(self.C_ACC, self.c["PKG"], self.c["ALT"], 0))
-        b = threading.Thread(target=lambda: self.update_graph(self.C_ACC, self.c["PKG"], self.c["ALT"], 1))
-        c = threading.Thread(target=lambda: self.update_graph(self.C_ACC, self.c["PKG"], self.c["ALT"], 2))
+        a = threading.Thread(target=lambda: self.update_graph(self.C_ACC, [(self.c["PKG"], self.c["ACX"]),
+                                                                           (self.c["PKG"], self.c["ACY"]),
+                                                                           (self.c["PKG"], self.c["ACZ"])]))
 
-        d = threading.Thread(target=lambda: self.update_graph(self.C_GYR, self.c["PKG"], self.c["ALT"], 0))
-        e = threading.Thread(target=lambda: self.update_graph(self.C_GYR, self.c["PKG"], self.c["ALT"], 1))
-        f = threading.Thread(target=lambda: self.update_graph(self.C_GYR, self.c["PKG"], self.c["ALT"], 2))
+        b = threading.Thread(target=lambda: self.update_graph(self.C_GYR, [(self.c["PKG"], self.c["GYX"]),
+                                                                           (self.c["PKG"], self.c["GYY"]),
+                                                                           (self.c["PKG"], self.c["GYZ"])]))
 
-        w = threading.Thread(target=lambda: self.update_graph(self.C_ALT, self.c["PKG"], self.c["ALT"]))
-        x = threading.Thread(target=lambda: self.update_graph(self.C_TEM, self.c["PKG"], self.c["TEM"]))
-        y = threading.Thread(target=lambda: self.update_graph(self.C_VEL, self.c["PKG"],
-                                                              self.to_vel(self.c["ACX"], self.c["ACY"], self.c["ACZ"])))
-        z = threading.Thread(target=lambda: self.update_graph(self.C_HUM, self.c["PKG"], self.c["HUM"]))
+        w = threading.Thread(target=lambda: self.update_graph(self.C_ALT, [(self.c["PKG"], self.c["ALT"])]))
+        x = threading.Thread(target=lambda: self.update_graph(self.C_TEM, [(self.c["PKG"], self.c["TEM"])]))
+        y = threading.Thread(target=lambda: self.update_graph(self.C_VEL, [(self.c["PKG"],self.to_vel(self.c["ACX"], self.c["ACY"], self.c["ACZ"]))]))
+        z = threading.Thread(target=lambda: self.update_graph(self.C_HUM, [(self.c["PKG"], self.c["HUM"])]))
         w.start()
         x.start()
         y.start()
@@ -383,17 +402,18 @@ class Controller:
     def update_rocket(self, data):
         self.r = data
         self.ui_main.ui.R_pkg.setText(str(self.r["PKG"]))
-        a = threading.Thread(target=lambda: self.update_graph(self.R_ACC, self.r["PKG"], self.r["ALT"], 0))
-        b = threading.Thread(target=lambda: self.update_graph(self.R_ACC, self.r["PKG"], self.r["ALT"], 1))
-        c = threading.Thread(target=lambda: self.update_graph(self.R_ACC, self.r["PKG"], self.r["ALT"], 2))
-        d = threading.Thread(target=lambda: self.update_graph(self.R_GYR, self.r["PKG"], self.r["ALT"], 0))
-        e = threading.Thread(target=lambda: self.update_graph(self.R_GYR, self.r["PKG"], self.r["ALT"], 1))
-        f = threading.Thread(target=lambda: self.update_graph(self.R_GYR, self.r["PKG"], self.r["ALT"], 2))
+        a = threading.Thread(target=lambda: self.update_graph(self.C_ACC, [(self.r["PKG"], self.r["ACX"]),
+                                                                           (self.r["PKG"], self.r["ACY"]),
+                                                                           (self.r["PKG"], self.r["ACZ"])]))
 
-        x = threading.Thread(target=lambda: self.update_graph(self.R_ALT, self.r["PKG"], self.r["ALT"]))
-        y = threading.Thread(target=lambda: self.update_graph(self.R_TEM, self.r["PKG"], self.r["TEM"]))
-        z = threading.Thread(target=lambda: self.update_graph(self.R_VEL, self.r["PKG"],
-                                                              self.to_vel(self.r["ACX"], self.r["ACY"], self.r["ACZ"])))
+        b = threading.Thread(target=lambda: self.update_graph(self.C_GYR, [(self.r["PKG"], self.r["GYX"]),
+                                                                           (self.r["PKG"], self.r["GYY"]),
+                                                                           (self.r["PKG"], self.r["GYZ"])]))
+
+        x = threading.Thread(target=lambda: self.update_graph(self.R_ALT, [(self.r["PKG"], self.r["ALT"])]))
+        y = threading.Thread(target=lambda: self.update_graph(self.R_TEM, [(self.r["PKG"], self.r["TEM"])]))
+        z = threading.Thread(target=lambda: self.update_graph(self.R_VEL, [(self.r["PKG"],
+                                                              self.to_vel(self.r["ACX"], self.r["ACY"], self.r["ACZ"]))]))
         x.start()
         y.start()
         z.start()
@@ -401,27 +421,8 @@ class Controller:
             mqttc = threading.Thread(target=lambda: mqtt.sendserver(self.mqtt, data))
             mqttc.start()
 
-    def update_state(self):
-        self.state_alt.append(float(self.r["ALT"]))
-        if float(self.r["ALT"]) > self.peak:
-            self.peak = float(self.r["ALT"])
-        if len(self.state_alt) < 10:
-            self.state = 'PRELAUNCH'
-            self.ground = self.state_alt[0]
-            self.ui_main.ui.State_bar.setMinimumSize(int(round(self.ground)))
-            self.ui_main.ui.State_bar.setMaximum(500)
-        elif self.state == "PRELAUNCH" and self.state_alt[-1] - self.ground > 10:
-            self.state = "LAUNCHED"
-        elif self.state == "LAUNCHED" and self.peak - self.state_alt[-1] > 10:
-            self.state = "APOGEE"
-            self.ui_main.ui.State_bar.setMaximumSize(self.peak * 2)
-        elif self.state == "APOGEE" and self.peak - self.state_alt[-1] > 30:
-            self.state = "DESCEND"
-        elif self.state == "DESCEND" and self.state_alt[-1] - self.ground < 10:
-            self.state = "LANDED"
-
-        self.ui_main.ui.State_bar.setValue((self.peak * 2) - self.state_alt[-1])
-        self.ui_main.ui.state_t.setText(self.state)
+    def update_state(self,alt):
+        self.alt.append(alt)
 
     def update_ground(self, data):
         self.g = data
