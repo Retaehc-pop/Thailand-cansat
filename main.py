@@ -1,150 +1,86 @@
-import Port
-import serial
-import math
-import RTC
-import mqtt
-import time
-from ui_main import Ui_GrounStation as UI_MainWindow
-from UI_splashscreen import Ui_MainWindow as UI_splashscreen
-from UI_Function import *
-from compasswidget import CompassWidget
-import sys
-import threading
-from PySide6.QtCharts import *
-from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtGui import *
-from PySide6.QtCore import *
-from PySide6.QtWidgets import *
-from GNSS import Coord
+from setting_files import *
+from setting_files.Clock import RTC
+from setting_files.Port import Port
+from setting_files.GNSS import GNSS
+from ui_main import Ui_GrounStation as Ui_MainWindow
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
-        self.ui = UI_MainWindow()
+        self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.connect_btn()
+        self.baud = None
+        self.port = None
         self.refresh()
-
-        def move_window(event):
-            if UiFunctions.return_status(self) == 1:
-                UiFunctions.maximize_restore(self)
-
-            if event.buttons() == Qt.LeftButton:
-                self.move(self.pos() + event.globalPos() - self.dragPos)
-                self.dragPos = event.globalPos()
-                event.accept()
-
-        self.ui.headframe.mouseMoveEvent = move_window
-        UiFunctions.ui_definitions(self)
         self.show()
-
-    def mousePressEvent(self, event):
-        self.dragPos = event.globalPos()
 
     def connect_btn(self):
-        self.ui.btn_connect.clicked.connect(self.online)
+        self.ui.btn_c_off.clicked.connect(self.send)
+        self.ui.btn_c_on.clicked.connect(self.send)
+        self.ui.btn_r_off.clicked.connect(self.send)
+        self.ui.btn_r_on.clicked.connect(self.send)
+        self.ui.btn_connect.clicked.connect(self.start)
         self.ui.btn_refresh.clicked.connect(self.refresh)
-        self.ui.btn_mqtt.clicked.connect(Window.start_mqtt)
-        self.ui.btn_clear.clicked.connect(self.clear())
-        self.ui.btn_c_on.clicked.connect(lambda: self.cmd('C_ON'))
-        self.ui.btn_c_off.clicked.connect(lambda: self.cmd('C_OF'))
-        self.ui.btn_r_on.clicked.connect(lambda: self.cmd('R_ON'))
-        self.ui.btn_r_off.clicked.connect(lambda: self.cmd('R_OF'))
+        self.ui.btn_clear.clicked.connect(self.clear)
 
     def refresh(self):
-        self.ui.portlist.clear()
-        for com in Port.Port.list_port():
-            self.ui.portlist.addItem(com)
+        self.ui.port_box.clear()
+        for port in Port.list_port():
+            self.ui.port_box.addItem(port)
+        baudrate = [110, 300, 600, 1200, 2400, 4800, 9600,
+                    14400, 19200, 38400, 57600, 115200, 128000, 256000]
+        self.ui.baud_box.clear()
+        for baud in baudrate:
+            self.ui.baud_box.addItem(str(baud))
+
+    def start(self):
+        Window.start(self.ui.port_box.currentText(),
+                     self.ui.baud_box.currentText())
 
     def clear(self):
-        try:
-            Window.clear()
-        except:
-            pass
+        Window.set_ui()
 
-    def online(self):
-        port = self.ui.portlist.currentText()
-        try:
-            self.device = serial.Serial(port, baudrate=int(9600), timeout=60)
-            Window.start_serial(self.device)
-            Window.start_clock()
-        except:
-            print("[Cannot connect port]")
-
-    def cmd(self, cmd):
-        self.device.write(f"CMD,{cmd}$".encode())
-        print(f"CMD,{cmd}$")
+    def send(self):
+        Window.serial.port.write()
 
 
-GLOBAL_SPLASH_COUNTER = 0
-
-
-class SplashScreen(QMainWindow):
-    def __init__(self):
-        QMainWindow.__init__(self)
-        self.ui = UI_splashscreen()
-        self.ui.setupUi(self)
-        self.ui.lb_title.setText(" ")
-        SplashScreenFunctions.ui_definitions(self)
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.progress)
-        self.timer.start(10)
-        self.show()
-
-    def progress(self):
-        global GLOBAL_SPLASH_COUNTER
-        status_text = str(GLOBAL_SPLASH_COUNTER) + '%'
-        if GLOBAL_SPLASH_COUNTER <= 17:
-            self.ui.lb_status.setText('Loading Assets...\n' + status_text)
-        elif GLOBAL_SPLASH_COUNTER <= 29:
-            self.ui.lb_status.setText('Scanning all COM Ports...\n' + status_text)
-        elif GLOBAL_SPLASH_COUNTER <= 42:
-            self.ui.lb_status.setText('Connecting to WAREDTANAS...\n' + status_text)
-        elif GLOBAL_SPLASH_COUNTER <= 54:
-            self.ui.lb_status.setText('Verifying WAREDTANS...\n' + status_text)
-        elif GLOBAL_SPLASH_COUNTER <= 64:
-            self.ui.lb_status.setText('Verifying Devices...\n' + status_text)
-        elif GLOBAL_SPLASH_COUNTER <= 75:
-            self.ui.lb_status.setText('Preparing Interface...\n' + status_text)
-        elif GLOBAL_SPLASH_COUNTER <= 100:
-            self.ui.lb_status.setText('Done.\n' + status_text)
-        else:
-            self.timer.stop()
-            Window.show_ui()
-            self.close()
-
-        GLOBAL_SPLASH_COUNTER += 1
-
-
-class ThreadMain(QThread):
+class SerialThread(QThread):
     carrier1 = QtCore.Signal(object)
     carrier2 = QtCore.Signal(object)
     carrier3 = QtCore.Signal(object)
 
-    def __init__(self, device, parent=None):
-        super(ThreadMain, self).__init__(parent)
-        self.device = device
-        self.port = Port.Port(device=self.device)
+    def __init__(self, com, baud, parent=None):
+        super(SerialThread, self).__init__(parent)
+        '''
+        'C': ["TYP", "PKG", "ALT", "LAT", "LNG", "TMP", "HUM", "PRE", "BAT", "P10", "P25", "ACX", "ACY", "ACZ", "GYX", "GYY", "GYZ"],
+        'R': ["TYP", "PKG", "ALT", "LAT", "LNG", "TMP", "BAT", "ACX", "ACY", "ACZ", "GAL", "GYX", "GYY", "GYZ"],
+        'G': ["TYP", "LAT", "LNG", "ALT", "MGX", "MGY", "MGZ"]
+        '''
+        self.dict = {
+            'C': ["TYP", "PKG", "ALT", "LAT", "LNG", "TMP", "HUM", "PRE", "BAT", "P10", "P25", "ACX", "ACY", "ACZ", "GYX", "GYY", "GYZ"],
+            'R': ["TYP", "PKG", "ALT", "LAT", "LNG", "TMP", "BAT", "ACX", "ACY", "ACZ", "GAL", "GYX", "GYY", "GYZ"],
+            'G': ["TYP", "LAT", "LNG", "ALT", "MGX", "MGY", "MGZ"]
+        }
+        self.port = Port(com=com, baudrate=baud, end='$', start='SPR',
+                         file_name='Cansat', key=self.dict)
+        self.port.connect()
 
     def __del__(self):
         self.wait()
 
     def run(self):
-        print('[THREAD_MAIN_START]')
+        print('[THREAD_PORT_START]')
         while True:
-            self.pkg = self.port.reading()
-            print(f"[THREAD_IN] : {self.pkg}")
+            self.pkg = self.port.reading_keys()
             if self.pkg["TYP"] == 'C':
-                print('[CANSAT]', end="")
                 self.pkg1 = self.pkg
                 self.carrier1.emit(self.pkg1)
-            elif self.pkg["TYP"] == 'R':
-                print('[ROCKET]', end="")
+            elif self.pkg["TYP"] == 'G':
                 self.pkg2 = self.pkg
                 self.carrier2.emit(self.pkg2)
-            elif self.pkg["TYP"] == 'G':
-                print('[GROUND]', end="")
+            elif self.pkg["TYP"] == 'R':
                 self.pkg3 = self.pkg
                 self.carrier3.emit(self.pkg3)
 
@@ -152,292 +88,145 @@ class ThreadMain(QThread):
         self._isRunning = False
 
 
-class ThreadTimer(QThread):
-    time_carrier = QtCore.Signal(object)
-    elapsed_carrier = QtCore.Signal(object)
+class TimerThread(QThread):
+    carrier1 = QtCore.Signal(object)
+    carrier2 = QtCore.Signal(object)
 
     def __init__(self, parent=None):
-        self._isRunning = True
-        super(ThreadTimer, self).__init__(parent)
+        super(TimerThread, self).__init__(parent)
+        self.clock = RTC()
 
     def __del__(self):
         self.wait()
 
     def run(self):
-        clock = RTC.GetTime()
         while True:
-            self.time_carrier.emit(clock.time_pc())
-            self.elapsed_carrier.emit(clock.time_elapsed())
+            self.carrier1.emit(self.clock.time_pc())
+            self.carrier2.emit(self.clock.time_elapsed())
+            time.sleep(0.01)
 
     def stop(self):
         self._isRunning = False
-        self.terminate()
 
-
-class Chart:
-    def __init__(self, Graph: QChartView, Title: str, unit: str, howmany=1, ):
-        self.color = [QColor(255, 0, 0),QColor(0, 255, 0),QColor(0, 0, 255)]
-        self.pen = [QPen(self.color[0]),QPen(self.color[1]),QPen(self.color[2])]
-
-        self.howmany = howmany
-        self.LINE = []
-        self.POINT = []
-        self.x = []
-        self.y = []
-        for i in range(howmany):
-            self.LINE.append(QSplineSeries())
-            self.POINT.append(QScatterSeries())
-            self.x.append([])
-            self.y.append([])
-            self.pen[i].setWidth(2)
-        self.CHART = QChart()
-        self.X_AXIS = QValueAxis()
-        self.Y_AXIS = QValueAxis()
-        self.Graph = Graph
-
-        self.Title = Title
-        self.Unit = unit
-
-        self.setup()
-
-    def setup(self):
-        self.Graph.setRenderHint(QPainter.Antialiasing)
-        self.CHART.legend().setVisible(False)
-        self.CHART.setDropShadowEnabled(True)
-        self.CHART.setAnimationOptions(QChart.SeriesAnimations)
-        self.CHART.setTheme(QChart.ChartThemeBrownSand)
-        self.CHART.createDefaultAxes()
-        self.X_AXIS.setRange(0, 100)
-        self.Y_AXIS.setRange(0, 100)
-        for i in range(self.howmany):
-            self.CHART.setAxisX(self.X_AXIS, self.LINE[i])
-            self.CHART.setAxisY(self.Y_AXIS, self.LINE[i])
-            self.CHART.addSeries(self.LINE[i])
-            self.CHART.addSeries(self.POINT[i])
-        self.CHART.setTitle(f"{self.Title} 0 {self.Unit}")
-        self.Graph.setChart(self.CHART)
-
-    def clear(self):
-        for i in range(self.howmany):
-            self.LINE[i].clear()
-            self.POINT[i].clear()
-
-    # def plot(self, x, y, index=0):
-    #     self.x.append(x)
-    #     self.y.append(y)
-    #     self.LINE[index].append(x, y)
-    #     self.POINT[index].append(x, y)
-    #     self.X_AXIS.setRange(min(self.x), max(self.x))
-    #     self.Y_AXIS.setRange(min(self.y), max(self.y))
-    #     self.CHART.setAxisX(self.X_AXIS, self.LINE[index])
-    #     self.CHART.setAxisY(self.Y_AXIS, self.LINE[index])
-    #     self.CHART.addSeries(self.LINE[index])
-    #     self.CHART.addSeries(self.POINT[index])
-    #     self.CHART.setTitle(f"{self.Title}{y}{self.Unit}")
-    #     self.Graph.setChart(self.CHART)
-    #     self.LINE[index].setPen(self.pen)
-    #     self.POINT[index].setColor(self.color)
-    #     self.POINT[index].setMarkerSize(8)
-
-    def plot(self, plot: list):
-        if len(plot) != self.howmany:
-            raise ValueError
-        else:
-            for index, p in enumerate(plot):
-                self.x[index].append(p[0])
-                self.y[index].append(p[1])
-                self.LINE[index].append(p[0], p[1])
-                self.POINT[index].append(p[0], p[1])
-                self.X_AXIS.setRange(min(min(self.x)), max(max(self.x)))
-                self.Y_AXIS.setRange(min(min(self.y)), max(max(self.y)))
-                self.CHART.setAxisX(self.X_AXIS, self.LINE[index])
-                self.CHART.setAxisY(self.Y_AXIS, self.LINE[index])
-                self.CHART.addSeries(self.LINE[index])
-                self.CHART.addSeries(self.POINT[index])
-                self.CHART.setTitle(f"{self.Title}{p[1]}{self.Unit}")
-                self.Graph.setChart(self.CHART)
-                self.LINE[index].setPen(self.pen[index])
-                self.POINT[index].setColor(self.color[index])
-                self.POINT[index].setMarkerSize(8)
 
 class Controller:
     def __init__(self):
-        self._send = False
-        self.state_alt = []
-        self.alet = []
-        self.show_splash()
-
-    def clear(self):
-        self.ui_main.ui.Sight.setText("0")
-        self.ui_main.ui.Azimuth.setText("0")
-        self.ui_main.ui.Elevation.setText("0")
-        self.ui_main.ui.GD.setText("0")
-        self.ui_main.ui.Heading.setText("0")
-        self.ui_main.ui.PM10.setText("0")
-        self.ui_main.ui.PM25.setText("0")
-        self.ui_main.ui.AQI.setText("0")
-        self.ui_main.ui.C_pkg.setText("0")
-        self.ui_main.ui.R_pkg.setText("0")
-        self.ui_main.ui.Drop.setText("0")
-        self.ui_main.ui.apogee.setText("0")
-        self.ui_main.ui.C_latitude.setText("0")
-        self.ui_main.ui.C_longitude.setText("0")
-        self.ui_main.ui.R_latitude.setText("0")
-        self.ui_main.ui.R_longitude.setText("0")
-
-    def setup(self):
-        self.c = {"PKG": 0, "ALT": 0, "LAT": 0,
-                  "LNG": 0, "TEM": 0, "HUM": 0,
-                  "PRE": 0, "BAT": 0, "P10": 0,
-                  "P25": 0, "ACX": 0, "ACY": 0,
-                  "ACZ": 0, "GYX": 0, "GYY": 0,
-                  "GYZ": 0}
-        self.r = {"PKG": 0, "ALT": 0, "LAT": 0,
-                  "LNG": 0, "TEM": 0, "BAT": 0,
-                  "ACX": 0, "ACY": 0, "ACZ": 0,
-                  "GYX": 0, "GYY": 0, "GYZ": 0}
-        self.g = {"LAT": 0.0, "LNG": 0.0, "ALT": 0.0,
-                  "MGX": 0.0, "MGY": 0.0, "MGZ": 0.0}
-
-    def show_splash(self):
-        self.window_splash = QtWidgets.QMainWindow()
-        self.ui_ui = SplashScreen()
-        print('[SPLASHSCREEN]', end="")
+        self.show_ui()
 
     def show_ui(self):
         self.window_ui = QtWidgets.QMainWindow()
         self.ui_main = MainWindow()
-        self.setup()
-        self.set_graph()
-        self.clear()
-        print('[MAINWINDOW]', end="")
+        self.set_ui()
+        self.set_clock()
 
-    def start_clock(self):
-        # x = threading.Thread(target=self.update_time)
-        # y = threading.Thread(target=self.update_elapsed)
-        # x.start()
-        # y.start()
-        self.worker_time = ThreadTimer()
-        self.worker_time.time_carrier.connect(self.update_time)
-        self.worker_time.elapsed_carrier.connect(self.update_elapsed)
-        self.worker_time.start()
+    def set_clock(self):
+        self.clock = TimerThread()
+        self.clock.carrier1.connect(self.update_clock)
+        self.clock.carrier2.connect(self.update_elapsed)
+        self.clock.start()
 
-    def start_serial(self, device):
-        self.worker_serial = ThreadMain(device)
-        self.worker_serial.carrier1.connect(self.update_cansat)
-        self.worker_serial.carrier2.connect(self.update_rocket)
-        self.worker_serial.carrier3.connect(self.update_ground)
-        self.worker_serial.start()
+    def update_clock(self, time):
+        self.ui_main.ui.Time.setText(time)
 
-    def start_mqtt(self):
-        try:
-            self.mqtt = mqtt.Initialise_client()
-            print("[MQTT_CONNECTED]")
-            self._send = True
-        except TimeoutError:
-            print("[MQTT_FAILED]")
-            self._send = False
+    def update_elapsed(self, time):
+        self.ui_main.ui.Elapsed.setText(time)
 
-    def update_time(self, data):
-        # while True:
-        #     self.clock = RTC.GetTime()
-        #     self.ui_main.ui.Time.setText(self.clock.time_pc())
-        #     time.sleep(0.1)
-        self.ui_main.ui.Time.setText(data)
+    def set_ui(self):
+        self.ui_main.ui.date.setText(str(RTC.date()))
 
-    def update_elapsed(self, data):
-        # while True:
-        #     self.ui_main.ui.Elapsed.setText(self.clock.time_elapsed())
-        #     time.sleep(0.1)
-        self.ui_main.ui.Elapsed.setText(data)
+        self.container = {'PKG': [], "ALT": [],
+                          "TMP": [], "VEL": [], "HUM": [], "LAT": 0, "LON": 0}
 
-    def set_graph(self):
-        self.C_ALT = Chart(self.ui_main.ui.C_alt_graph, "ALTITUDE", "(m)")
-        self.C_TEM = Chart(self.ui_main.ui.C_temp_graph, "TEMPERATURE", "(C)")
-        self.C_VEL = Chart(self.ui_main.ui.C_velo_graph, "VELOCITY", "(m/s)")
-        self.C_HUM = Chart(self.ui_main.ui.C_humid_graph, "HUMIDITY", "(m)")
-        self.C_ACC = Chart(self.ui_main.ui.C_acc_graph, "Acceleration", "(m/s2)", 3)
-        self.C_GYR = Chart(self.ui_main.ui.C_gyro_graph, "Gyroscope", "(deg)", 3)
+        self.rocket = {'PKG': [], "ALT": [],
+                       "VEL": [], "TMP": [], "LAT": 0, "LON": 0}
 
-        self.R_ALT = Chart(self.ui_main.ui.R_alt_graph, "ALTITUDE", "(m)")
-        self.R_TEM = Chart(self.ui_main.ui.R_temp_graph, "TEMPERATURE", "(C)")
-        self.R_VEL = Chart(self.ui_main.ui.R_velo_graph, "VELOCITY", "(m/s)")
-        self.R_ACC = Chart(self.ui_main.ui.R_acc_graph, "Acceleration", "(m/s2)", 3)
-        self.R_GYR = Chart(self.ui_main.ui.R_gyro_graph, "Gyroscope", "(deg)", 3)
+    def start(self, com, baud):
+        self.serial = SerialThread(com, baud)
+        self.serial.carrier1.connect(self.update_container)
+        self.serial.carrier2.connect(self.update_rocket)
+        self.serial.carrier3.connect(self.update_ground)
+        self.ui_main.ui.file_name.setText(self.serial.port.path)
+        self.serial.start()
 
-    def update_graph(self, graph, plot:list):
-        try:
-            graph.plot(plot)
-        except ValueError:
-            print("wrong array size")
+    def update_container(self, data):
+        self.ui_main.ui.C_pkg.setText(data["PKG"])
+        self.ui_main.ui.alt_c.setText(f'Altitude {data["ALT"]} M')
+        self.ui_main.ui.tmp_c.setText(f'Temperature {data["TMP"]} C')
+        self.ui_main.ui.vel_c.setText(f'Velocity {data["ACZ"]} M/S')
+        self.ui_main.ui.hum_c.setText(f'Humidity {data["HUM"]} %')
 
-    def update_cansat(self, data):
-        self.c = data
-        self.ui_main.ui.C_pkg.setText(str(self.c["PKG"]))
-        self.ui_main.ui.PM10.setText(f'{self.c["P10"]} ug/m3')
-        self.ui_main.ui.PM25.setText(f'{self.c["P25"]} ug/m3')
-        self.ui_main.ui.AQI.setText(f'{(self.c["P25"] + self.c["P10"]) / 2} ug/m3')
-        self.ui_main.ui.Drop.setText(f'{self.c["ACZ"]} m/s')
+        self.ui_main.ui.PM10.setText(data["PM10"])
+        self.ui_main.ui.PM25.setText(data["PM25"])
+        self.ui_main.ui.AQI.setText((data["PM25"]+data["PM10"])/2)
 
-        a = threading.Thread(target=lambda: self.update_graph(self.C_ACC, [(self.c["PKG"], self.c["ACX"]),
-                                                                           (self.c["PKG"], self.c["ACY"]),
-                                                                           (self.c["PKG"], self.c["ACZ"])]))
+        self.ui_main.ui.acx_c.setText(f'[ACC X] {data["ACX"]}')
+        self.ui_main.ui.acy_c.setText(f'[ACC Y] {data["ACY"]}')
+        self.ui_main.ui.acz_c.setText(f'[ACC Z] {data["ACZ"]}')
+        self.ui_main.ui.gyx_c.setText(f'[GYR X] {data["GYX"]}')
+        self.ui_main.ui.gyy_c.setText(f'[GYR Y] {data["GYY"]}')
+        self.ui_main.ui.gyz_c.setText(f'[GYR Z] {data["GYZ"]}')
 
-        b = threading.Thread(target=lambda: self.update_graph(self.C_GYR, [(self.c["PKG"], self.c["GYX"]),
-                                                                           (self.c["PKG"], self.c["GYY"]),
-                                                                           (self.c["PKG"], self.c["GYZ"])]))
+        self.ui_main.ui.lat_c.setText(data["LAT"])
+        self.ui_main.ui.lng_c.setText(data["LNG"])
 
-        w = threading.Thread(target=lambda: self.update_graph(self.C_ALT, [(self.c["PKG"], self.c["ALT"])]))
-        x = threading.Thread(target=lambda: self.update_graph(self.C_TEM, [(self.c["PKG"], self.c["TEM"])]))
-        y = threading.Thread(target=lambda: self.update_graph(self.C_VEL, [(self.c["PKG"],self.to_vel(self.c["ACX"], self.c["ACY"], self.c["ACZ"]))]))
-        z = threading.Thread(target=lambda: self.update_graph(self.C_HUM, [(self.c["PKG"], self.c["HUM"])]))
-        w.start()
+        self.container["PKG"].append(int(data['PKG']))
+        self.container["ALT"].append(float(data['ALT']))
+        self.container["TMP"].append(float(data['TMP']))
+        self.container["ACZ"].append(float(data['ACZ']))
+        self.container["HUM"].append(float(data['HUM']))
+        self.container["LAT"] = data["LAT"]
+        self.container["LNG"] = data["LNG"]
+
+        self.plot(self.ui_main.ui.graph_1, data['PKG'], data['ALT'])
+        self.plot(self.ui_main.ui.graph_2, data['PKG'], data['TMP'])
+        self.plot(self.ui_main.ui.graph_3, data['PKG'], data['ACZ'])
+        self.plot(self.ui_main.ui.graph_4, data['PKG'], data['HUM'])
+        x = threading.Thread(target=self.update_ground)
         x.start()
-        y.start()
-        z.start()
-        if self._send:
-            mqttc = threading.Thread(target=lambda: mqtt.sendserver(self.mqtt, data))
-            mqttc.start()
 
     def update_rocket(self, data):
-        self.r = data
-        self.ui_main.ui.R_pkg.setText(str(self.r["PKG"]))
-        a = threading.Thread(target=lambda: self.update_graph(self.C_ACC, [(self.r["PKG"], self.r["ACX"]),
-                                                                           (self.r["PKG"], self.r["ACY"]),
-                                                                           (self.r["PKG"], self.r["ACZ"])]))
+        self.ui_main.ui.R_pkg.setText(data["PKG"])
+        self.ui_main.ui.alt_r.setText(f'Altitude {data["ALT"]} M')
+        self.ui_main.ui.tmp_r.setText(f'Temperature {data["TMP"]} C')
+        self.ui_main.ui.vel_r.setText(f'Velocity {data["ACZ"]} M/S')
 
-        b = threading.Thread(target=lambda: self.update_graph(self.C_GYR, [(self.r["PKG"], self.r["GYX"]),
-                                                                           (self.r["PKG"], self.r["GYY"]),
-                                                                           (self.r["PKG"], self.r["GYZ"])]))
+        self.ui_main.ui.acx_r.setText(f'[ACC X] {data["ACX"]}')
+        self.ui_main.ui.acy_r.setText(f'[ACC Y] {data["ACY"]}')
+        self.ui_main.ui.acz_r.setText(f'[ACC Z] {data["ACZ"]}')
+        self.ui_main.ui.gyx_r.setText(f'[GYR X] {data["GYX"]}')
+        self.ui_main.ui.gyy_r.setText(f'[GYR Y] {data["GYY"]}')
+        self.ui_main.ui.gyz_r.setText(f'[GYR Z] {data["GYZ"]}')
 
-        x = threading.Thread(target=lambda: self.update_graph(self.R_ALT, [(self.r["PKG"], self.r["ALT"])]))
-        y = threading.Thread(target=lambda: self.update_graph(self.R_TEM, [(self.r["PKG"], self.r["TEM"])]))
-        z = threading.Thread(target=lambda: self.update_graph(self.R_VEL, [(self.r["PKG"],
-                                                              self.to_vel(self.r["ACX"], self.r["ACY"], self.r["ACZ"]))]))
-        x.start()
-        y.start()
-        z.start()
-        if self._send:
-            mqttc = threading.Thread(target=lambda: mqtt.sendserver(self.mqtt, data))
-            mqttc.start()
+        self.ui_main.ui.lat_r.setText(data["LAT"])
+        self.ui_main.ui.lng_r.setText(data["LNG"])
 
-    def update_state(self,alt):
-        self.alt.append(alt)
+        self.container["PKG"].append(int(data['PKG']))
+        self.container["ALT"].append(float(data['ALT']))
+        self.container["TMP"].append(float(data['TMP']))
+        self.container["ACZ"].append(float(data['ACZ']))
+
+        self.plot(self.ui_main.ui.graph_1, data['PKG'], data['ALT'])
+        self.plot(self.ui_main.ui.graph_2, data['PKG'], data['TMP'])
+        self.plot(self.ui_main.ui.graph_3, data['PKG'], data['ACZ'])
 
     def update_ground(self, data):
-        self.g = data
-        self.GNSS = Coord(self.g["LAT"], self.g["LNG"], self.c["LAT"], self.c["LNG"], self.g["ALT"], self.c["ALT"],
-                          self.g["MGX"], self.g["MGY"], self.g["MGZ"])
-        self.ui_main.ui.Azimuth.setText(str(self.GNSS.azimuth()))
-        self.ui_main.ui.Elevation.setText(str(self.GNSS.elevation()))
-        self.ui_main.ui.GD.setText(str(self.GNSS.ground_distance()))
-        self.ui_main.ui.Sight.setText(str(self.GNSS.line_of_sight()))
-        self.ui_main.ui.Heading.setText(str(self.GNSS.heading()))
+        "lat_g, lng_g, lat_c, lng_c, alt_g, alt_c, x, y, z"
+        g = GNSS(data["LAT"], data["LNG"], self.container["LAT"],
+                 self.container["LON"], data["ALT"], self.container["ALT"][-1], data["MGX"], data["MGY"], data["MGZ"])
+        self.ui_main.ui.Azimuth.setText(str(g.azimuth()))
+        self.ui_main.ui.Elevation.setText(str(g.elevation()))
+        self.ui_main.ui.Heading.setText(str(g.heading()))
+        self.ui_main.ui.Sight.setText(str(g.line_of_sight()))
 
-    @staticmethod
-    def to_vel(a, b, c):
-        vel = math.sqrt((a * a) + (b * b) + (c * c))
-        return vel
+    def plot(self, graph, pkg, data):
+        x = threading.Thread(target=self.update_graph, args=(graph, pkg, data))
+        x.start()
+
+    def update_graph(self, graph, pkg, data):
+        if len(pkg) > 50:
+            graph.plot(pkg[-50:-1], data[-50:-1])
+        else:
+            graph.plot(pkg, data)
 
 
 if __name__ == "__main__":
